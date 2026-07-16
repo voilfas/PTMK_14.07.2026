@@ -1,0 +1,7 @@
+﻿services:
+  ticket.api:
+    image: ticket.api
+    build:
+      context: .
+      dockerfile: src/Ticket.API/Dockerfile
+
