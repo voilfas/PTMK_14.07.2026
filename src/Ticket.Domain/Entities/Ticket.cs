@@ -1,40 +1,52 @@
-﻿using Ticket.Domain.Common;
+﻿using Ticket.Domain.Abstractions;
+using Ticket.Domain.Common;
 using Ticket.Domain.Enums;
 using Ticket.Domain.Errors;
+using Ticket.Domain.Events;
 using Ticket.Domain.ValueObjects;
 
 namespace Ticket.Domain.Entities;
 
-public class Ticket
+public class Ticket : AggregateRoot
 {
     public Guid Id { get; private set; }
     public TicketNumber TicketNumber { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public Guid AuthorId { get; private set; }
-    public Guid? ExecutorId { get; private set; }
     public string Description { get; private set; }
-    public DateTime DeadLine { get; private set; }
+    public DateTime Deadline { get; private set; }
     public TicketStatus Status { get; private set; }
+    public TicketType Type { get; private set; }
+    
+    private readonly List<Guid> _executorIds = [];
+    public IReadOnlyList<Guid> ExecutorIds => _executorIds.AsReadOnly();
 
-    private Ticket(Guid authorId, string description, DateTime deadLine, Guid? executorId = null)
+    private Ticket(Guid authorId, List<Guid>? executorIds, string description, TicketType type)
     {
         Id = Guid.NewGuid();
         TicketNumber = TicketNumber.Generate(Id);
         CreatedAt = DateTime.UtcNow;
         AuthorId = authorId;
-        ExecutorId = executorId;
+        if (executorIds != null) _executorIds.AddRange(executorIds);
         Description = description;
-        DeadLine = deadLine;
+        Deadline = CalculateDeadline(type);
         Status = TicketStatus.New;
     }
 
-    public static Result<Ticket> Create(Guid authorId, Guid? executorId, string description, DateTime deadLine)
+    public static Result<Ticket> Create(Guid authorId, List<Guid>? executorIds, string description, TicketType type)
     {
         if (authorId == Guid.Empty)
             return Result<Ticket>.Failure(ErrorsTicket.EmptyAuthorId);
 
-        if (executorId.HasValue && executorId.Value == Guid.Empty)
-            return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
+        if (executorIds is not null)
+        {
+            var distinctExecutorIds = executorIds.Distinct().ToList();
+            if (distinctExecutorIds.Count != executorIds.Count)
+                return Result<Ticket>.Failure(ErrorsTicket.DistinctExecutors);
+            
+            if (distinctExecutorIds.Any(id => id == Guid.Empty))
+                return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
+        }
         
         if (string.IsNullOrWhiteSpace(description))
             return Result<Ticket>.Failure(ErrorsTicket.EmptyDescription);
@@ -42,45 +54,134 @@ public class Ticket
         if (description.Length is < 3 or > 300)
             return Result<Ticket>.Failure(ErrorsTicket.IncorrectDescription);
 
-        if (deadLine <= DateTime.UtcNow || deadLine > DateTime.UtcNow.AddYears(1))
-            return Result<Ticket>.Failure(ErrorsTicket.IncorrectDeadLine);
-
-        return Result<Ticket>.Success(new Ticket(authorId, description, deadLine, executorId));
+        return Result<Ticket>.Success(new Ticket(authorId, executorIds, description, type));
     }
-    
-    public Result ChangeStatus(TicketStatus status)
+
+    public Result AddExecutors(List<Guid>? executorIds)
     {
-        if (Status == status)
+        if (executorIds == null || !executorIds.Any())
             return Result.Success();
         
-        if (Status == TicketStatus.New && status == TicketStatus.Completed)
-            return Result.Failure(ErrorsTicket.FailStatusFromNewToCompleted);
+        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
+            return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
 
-        if (Status == TicketStatus.Completed && status == TicketStatus.InProgress)
-            return Result.Failure(ErrorsTicket.FailStatusFromCompletedToInProgress);
-
-        if (!((Status == TicketStatus.InProgress && status == TicketStatus.Completed) ||
-              (Status == TicketStatus.New && status == TicketStatus.InProgress)))
-            return Result.Failure(ErrorsTicket.InvalidStatusTransition);
+        if (Status != TicketStatus.New && Status != TicketStatus.InProgress)
+            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
         
-        Status = status;
+        var distinctExecutorIds = executorIds.Distinct().ToList();
+
+        if (distinctExecutorIds.Count != executorIds.Count)
+            return Result.Failure(ErrorsTicket.DistinctExecutors);
+
+        if (distinctExecutorIds.Any(executorId => executorId == Guid.Empty))
+            return Result.Failure(ErrorsTicket.EmptyExecutorId);
+
+        var newIds = distinctExecutorIds.Where(guid => !_executorIds.Contains(guid)).ToList();
+        if(!newIds.Any())
+            return Result.Success();
+        
+        foreach (var newExecutorId in newIds)
+        {
+            _executorIds.Add(newExecutorId);
+        }
+        
+        AddEvent(new TicketExecutorAddListEvent(Id, newIds));
         
         return Result.Success();
     }
 
-    public Result ChangeExecutor(Guid executorId)
+    public Result ChangeExecutor(Guid oldExecutorId, Guid newExecutorId)
+    {
+        if (oldExecutorId == Guid.Empty ||  newExecutorId == Guid.Empty)
+            return Result.Failure(ErrorsTicket.EmptyExecutorId);
+        
+        if (oldExecutorId == newExecutorId)
+            return Result.Success();
+        
+        if (Status != TicketStatus.New && Status != TicketStatus.InProgress)
+            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
+        
+        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
+            return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
+        
+        if (!_executorIds.Contains(oldExecutorId))
+            return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
+        
+        if (_executorIds.Contains(newExecutorId))
+            return Result.Failure(ErrorsTicket.ExecutorAlreadyExist);
+        
+        _executorIds.Remove(oldExecutorId);
+        _executorIds.Add(newExecutorId);
+        
+        AddEvent(new TicketExecutorChangedEvent(Id, oldExecutorId, newExecutorId));
+        
+        return Result.Success();
+    }
+
+    public Result DeleteExecutor(Guid executorId)
     {
         if (executorId == Guid.Empty)
             return Result.Failure(ErrorsTicket.EmptyExecutorId);
         
-        if (Status == TicketStatus.Completed)
-            return Result.Failure(ErrorsTicket.InvalidChangeExecutor);
-
-        if (executorId == ExecutorId)
-            return Result.Success();
+        if (!_executorIds.Contains(executorId))
+            return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
         
-        ExecutorId = executorId;
+        _executorIds.Remove(executorId);
+        
+        AddEvent(new TicketExecutorRemoveEvent(Id, executorId));
         
         return Result.Success();
     }
+    
+    public Result ChangeStatus(TicketStatus newStatus)
+    {
+        if (Status == newStatus)
+            return Result.Success();
+
+        if (!AllowedTransitions.Contains((Status, newStatus)))
+            return Result.Failure(ErrorsTicket.InvalidStatusTransition);
+        
+        var oldStatus = Status;
+        Status = newStatus;
+        AddEvent(new TicketStatusChangedEvent(Id, oldStatus, newStatus));
+        
+        return Result.Success();
+    }
+
+    public Result ChangeType(TicketType newType)
+    {
+        if (Type == newType)
+            return Result.Success();
+        
+        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
+            return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
+        
+        Type = newType;
+        Deadline = CalculateDeadline(newType);
+        
+        return Result.Success();
+    }
+    
+    private DateTime CalculateDeadline(TicketType type)
+    {
+        var now = DateTime.UtcNow;
+
+        return type switch
+        {
+            TicketType.Standart => now.AddDays(3),
+            TicketType.Urgent => now.AddDays(1),
+            TicketType.Critical => now.AddHours(4),
+            _ => now.AddDays(3)
+        };
+    }
+    
+    private static readonly HashSet<(TicketStatus From, TicketStatus To)> AllowedTransitions = new()
+    {
+        (TicketStatus.New, TicketStatus.AwaitingApproval),
+        (TicketStatus.AwaitingApproval, TicketStatus.Approved),
+        (TicketStatus.AwaitingApproval, TicketStatus.Rejected),
+        (TicketStatus.Rejected, TicketStatus.New),
+        (TicketStatus.Approved, TicketStatus.InProgress),
+        (TicketStatus.InProgress, TicketStatus.Completed),
+    };
 }
