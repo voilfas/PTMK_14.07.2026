@@ -3,6 +3,9 @@
 public enum TicketStatus
 {
     New = 0,
-    InProgress = 1,
-    Completed = 2
+    AwaitingApproval = 1,
+    Approved = 2,
+    Rejected = 3,
+    InProgress = 4,
+    Completed = 5
 }
