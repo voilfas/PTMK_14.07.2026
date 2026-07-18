@@ -1,4 +1,4 @@
-﻿namespace TicketService.Domain.Common;
+﻿namespace TicketService.Domain.Common.ErrorHandler;
 
 public class Error
 {
