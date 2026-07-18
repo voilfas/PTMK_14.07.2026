@@ -1,18 +1,20 @@
 ﻿using TicketService.Domain.Common;
+using TicketService.Domain.Common.ErrorHandler;
 using TicketService.Domain.Errors;
 
 namespace TicketService.Domain.ValueObjects;
 
-public record Department
+public class Department
 {
-    //private bool IsActive { get; } можно сделать сущностью
-    private string Name { get; }
-    private string Code { get;  }
+    public string Name { get; private set; }
+    public string Code { get; private set; }
+    public bool IsActive { get; private set; }
 
     private Department(string name, string code)
     {
         Name = name;
         Code = code;
+        IsActive = true;
     }
 
     public static Result<Department> Create(string name, string code)
@@ -32,5 +34,23 @@ public record Department
         return Result<Department>.Success(new Department(name, code));
     }
 
-    public override string ToString() => $"{Name} {Code}";
+    public Result ActivateDepartment()
+    {
+        if (IsActive)
+            return Result.Success();
+        
+        IsActive = true;
+        
+        return Result.Success();
+    }
+
+    public Result DeactivateDepartment()
+    {
+        if (!IsActive)
+            return Result.Success();
+        
+        IsActive = false;
+        
+        return Result.Success();
+    }
 }
