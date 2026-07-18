@@ -1,10 +1,9 @@
-﻿using TicketService.Domain.Common;
-using TicketService.Domain.Common.ErrorHandler;
+﻿using TicketService.Domain.Common.ErrorHandler;
 using TicketService.Domain.Errors;
 
-namespace TicketService.Domain.ValueObjects;
+namespace TicketService.Domain.Entities;
 
-public class Department
+public class Department : BaseEntity
 {
     public string Name { get; private set; }
     public string Code { get; private set; }
@@ -12,6 +11,7 @@ public class Department
 
     private Department(string name, string code)
     {
+        Id =  Guid.NewGuid();
         Name = name;
         Code = code;
         IsActive = true;
@@ -34,23 +34,22 @@ public class Department
         return Result<Department>.Success(new Department(name, code));
     }
 
-    public Result ActivateDepartment()
+    public Result ChangeName(string newName)
     {
-        if (IsActive)
+        if (Name ==  newName)
             return Result.Success();
         
-        IsActive = true;
+        if (string.IsNullOrWhiteSpace(newName)) 
+            return Result.Failure(ErrorsDepartment.EmptyName);
         
+        if (newName.Length is < 2 or > 30)
+            return Result.Failure(ErrorsDepartment.IncorrectName);
+        
+        Name =  newName;
         return Result.Success();
     }
 
-    public Result DeactivateDepartment()
-    {
-        if (!IsActive)
-            return Result.Success();
-        
-        IsActive = false;
-        
-        return Result.Success();
-    }
+    public void Activate() => IsActive = true;
+
+    public void Deactivate() => IsActive = false;
 }

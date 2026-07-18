@@ -1,5 +1,6 @@
 ﻿using TicketService.Domain.Abstractions;
 using TicketService.Domain.Common;
+using TicketService.Domain.Common.ErrorHandler;
 using TicketService.Domain.Enums;
 using TicketService.Domain.Errors;
 using TicketService.Domain.Events;
@@ -9,7 +10,6 @@ namespace TicketService.Domain.Entities;
 
 public class Ticket : AggregateRoot
 {
-    public Guid Id { get; private set; }
     public TicketNumber TicketNumber { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public Guid AuthorId { get; private set; }
