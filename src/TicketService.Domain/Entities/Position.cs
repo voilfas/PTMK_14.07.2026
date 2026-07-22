@@ -1,4 +1,4 @@
-﻿using TicketService.Domain.Common.ErrorHandler;
+﻿using TicketService.Domain.Common;
 using TicketService.Domain.Errors;
 
 namespace TicketService.Domain.Entities;
