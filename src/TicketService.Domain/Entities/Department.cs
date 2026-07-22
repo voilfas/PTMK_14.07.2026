@@ -1,19 +1,20 @@
-﻿using TicketService.Domain.Common.ErrorHandler;
+﻿using TicketService.Domain.Common;
 using TicketService.Domain.Errors;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Domain.Entities;
 
 public class Department : BaseEntity
 {
     public string Name { get; private set; }
-    public string Code { get; private set; }
+    public CodeDepartment Code { get; private set; }
     public bool IsActive { get; private set; }
 
-    private Department(string name, string code)
+    private Department(string name, string codeName)
     {
         Id =  Guid.NewGuid();
         Name = name;
-        Code = code;
+        Code = CodeDepartment.Generate(codeName);
         IsActive = true;
     }
 
