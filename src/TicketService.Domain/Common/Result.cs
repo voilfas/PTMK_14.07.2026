@@ -1,10 +1,10 @@
-﻿namespace TicketService.Domain.Common.ErrorHandler;
+﻿namespace TicketService.Domain.Common;
 
 public class Result
 {
-    private bool IsSuccess { get; }
-    private bool IsFailure => !IsSuccess;
-    private Error? Error { get; }
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    public Error? Error { get; }
 
     protected Result(bool isSuccess, Error? error)
     {
