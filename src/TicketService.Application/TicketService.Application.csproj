@@ -12,4 +12,10 @@
       <ProjectReference Include="..\TicketService.Domain\TicketService.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="UseCases\Departments\Commands\" />
+      <Folder Include="UseCases\Employees\Commands\" />
+      <Folder Include="UseCases\Positions\Commands\" />
+    </ItemGroup>
+
 </Project>
