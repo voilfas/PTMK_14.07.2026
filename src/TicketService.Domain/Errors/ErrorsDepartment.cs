@@ -1,5 +1,4 @@
 ﻿using TicketService.Domain.Common;
-using TicketService.Domain.Common.ErrorHandler;
 
 namespace TicketService.Domain.Errors;
 
@@ -10,6 +9,4 @@ public static class ErrorsDepartment
     
     public static readonly Error IncorrectName = new Error("Department.IncorrectName", "Name should contain 2 - 30 symbols");
     public static readonly Error IncorrectCode = new Error("Department.IncorrectCode", "First name should contain 5 - 15 symbols");
-    
-    public static readonly Error Inactive = new Error("Department.Inactive", "Can't create inactive department");
 }
