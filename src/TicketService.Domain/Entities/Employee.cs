@@ -1,5 +1,4 @@
 ﻿using TicketService.Domain.Common;
-using TicketService.Domain.Common.ErrorHandler;
 using TicketService.Domain.Enums;
 using TicketService.Domain.ValueObjects;
 

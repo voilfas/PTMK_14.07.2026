@@ -2,7 +2,7 @@
 
 public enum TicketType
 {
-    Standart = 0,
+    Standard = 0,
     Urgent = 1,
     Critical = 2
 }

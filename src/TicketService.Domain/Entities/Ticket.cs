@@ -1,6 +1,5 @@
 ﻿using TicketService.Domain.Abstractions;
 using TicketService.Domain.Common;
-using TicketService.Domain.Common.ErrorHandler;
 using TicketService.Domain.Enums;
 using TicketService.Domain.Errors;
 using TicketService.Domain.Events;
@@ -18,95 +17,116 @@ public class Ticket : AggregateRoot
     public TicketStatus Status { get; private set; }
     public TicketType Type { get; private set; }
     
-    private readonly List<Guid> _executorIds = [];
-    public IReadOnlyList<Guid> ExecutorIds => _executorIds.AsReadOnly();
+    private readonly HashSet<Guid> _executorIds = [];
+    public IReadOnlyCollection<Guid> ExecutorIds => _executorIds;
 
-    private Ticket(Guid authorId, List<Guid>? executorIds, string description, TicketType type)
+    private Ticket(
+        Guid authorId,
+        IReadOnlyCollection<Guid> executorIds,
+        string description,
+        TicketType type)
     {
         Id = Guid.NewGuid();
         TicketNumber = TicketNumber.Generate(Id);
         CreatedAt = DateTime.UtcNow;
-        AuthorId = authorId;
-        if (executorIds != null) _executorIds.AddRange(executorIds);
+        AuthorId = authorId; 
         Description = description;
-        Deadline = CalculateDeadline(type);
         Status = TicketStatus.New;
+        Type = type;
+        Deadline = CalculateDeadline(type);
+        _executorIds.UnionWith(executorIds);
     }
 
-    public static Result<Ticket> Create(Guid authorId, List<Guid>? executorIds, string description, TicketType type)
+    public static Result<Ticket> Create(
+        Guid authorId,
+        IReadOnlyCollection<Guid> executorIds,
+        string description,
+        TicketType type)
     {
+        // Пустой Guid автора
         if (authorId == Guid.Empty)
             return Result<Ticket>.Failure(ErrorsTicket.EmptyAuthorId);
 
-        if (executorIds is not null)
-        {
-            var distinctExecutorIds = executorIds.Distinct().ToList();
-            if (distinctExecutorIds.Count != executorIds.Count)
-                return Result<Ticket>.Failure(ErrorsTicket.DistinctExecutors);
-            
-            if (distinctExecutorIds.Any(id => id == Guid.Empty))
-                return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
-        }
-        
+        // Пустой Guid у исполнителей
+        if (executorIds.Any(id => id == Guid.Empty))
+            return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
+
+        // Повторяющиеся Guid у исполнителей
+        if (executorIds.Distinct().Count() != executorIds.Count)
+            return Result<Ticket>.Failure(ErrorsTicket.DistinctExecutors);
+
+        // Пустое описание 
         if (string.IsNullOrWhiteSpace(description))
             return Result<Ticket>.Failure(ErrorsTicket.EmptyDescription);
-        
+
+        // Невалидная длина описания
         if (description.Length is < 3 or > 300)
             return Result<Ticket>.Failure(ErrorsTicket.IncorrectDescription);
 
-        return Result<Ticket>.Success(new Ticket(authorId, executorIds, description, type));
+        return Result<Ticket>.Success(
+            new Ticket(authorId, executorIds, description, type));
     }
 
-    public Result AddExecutors(List<Guid>? executorIds)
+    public Result AddExecutors(IReadOnlyCollection<Guid> executorIds)
     {
-        if (executorIds == null || !executorIds.Any())
+        // Проверка на пустую коллекцию
+        if (executorIds.Count == 0)
             return Result.Success();
         
-        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
-            return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
+        // Проверка на статус заявки
+        var canManage = CanManageExecutors();
+        if (canManage.IsFailure)
+            return canManage;
 
-        if (Status != TicketStatus.New && Status != TicketStatus.InProgress)
-            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
-        
-        var distinctExecutorIds = executorIds.Distinct().ToList();
+        // Проверка на повторяющиеся элементы в коллекции
+        var newExecutors = new HashSet<Guid>(executorIds);
 
-        if (distinctExecutorIds.Count != executorIds.Count)
+        if (newExecutors.Count != executorIds.Count)
             return Result.Failure(ErrorsTicket.DistinctExecutors);
-
-        if (distinctExecutorIds.Any(executorId => executorId == Guid.Empty))
-            return Result.Failure(ErrorsTicket.EmptyExecutorId);
-
-        var newIds = distinctExecutorIds.Where(guid => !_executorIds.Contains(guid)).ToList();
-        if(!newIds.Any())
-            return Result.Success();
         
-        foreach (var newExecutorId in newIds)
+        // Проверка на Пустые Guid в коллекции
+        if (newExecutors.Any(id => id == Guid.Empty))
+            return Result.Failure(ErrorsTicket.EmptyExecutorId);
+        
+        // Проверка сколько уникальных Guid добавили в коллекцию
+        var addedExecutors = new List<Guid>();
+
+        foreach (var id in newExecutors)
         {
-            _executorIds.Add(newExecutorId);
+            if(_executorIds.Add(id))
+                addedExecutors.Add(id);
         }
         
-        AddEvent(new TicketExecutorAddListEvent(Id, newIds));
+        if (addedExecutors.Count == 0)
+            return Result.Success();
+        
+        AddEvent(new TicketExecutorAddListEvent(Id, addedExecutors));
         
         return Result.Success();
     }
 
-    public Result ChangeExecutor(Guid oldExecutorId, Guid newExecutorId)
+    public Result ChangeExecutor(
+        Guid oldExecutorId,
+        Guid newExecutorId)
     {
-        if (oldExecutorId == Guid.Empty ||  newExecutorId == Guid.Empty)
-            return Result.Failure(ErrorsTicket.EmptyExecutorId);
-        
+        // Индемпотентность Guid-ов
         if (oldExecutorId == newExecutorId)
             return Result.Success();
         
-        if (Status != TicketStatus.New && Status != TicketStatus.InProgress)
-            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
+        // Пустой Guid
+        if (oldExecutorId == Guid.Empty ||  newExecutorId == Guid.Empty)
+            return Result.Failure(ErrorsTicket.EmptyExecutorId);
         
-        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
-            return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
+        // Статус заявки
+        var canManage = CanManageExecutors();
+        if (canManage.IsFailure)
+            return canManage;
         
+        // Старого Guid не найдено в коллекции
         if (!_executorIds.Contains(oldExecutorId))
             return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
         
+        // Новый Guid уже содержится в коллекции
         if (_executorIds.Contains(newExecutorId))
             return Result.Failure(ErrorsTicket.ExecutorAlreadyExist);
         
@@ -120,11 +140,18 @@ public class Ticket : AggregateRoot
 
     public Result DeleteExecutor(Guid executorId)
     {
+        // Пустой Guid
         if (executorId == Guid.Empty)
             return Result.Failure(ErrorsTicket.EmptyExecutorId);
         
+        // Не найден Guid в коллекции
         if (!_executorIds.Contains(executorId))
             return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
+        
+        // Проверка на статус заявки
+        var canManage = CanManageExecutors();
+        if (canManage.IsFailure)
+            return canManage;
         
         _executorIds.Remove(executorId);
         
@@ -135,9 +162,11 @@ public class Ticket : AggregateRoot
     
     public Result ChangeStatus(TicketStatus newStatus)
     {
+        // Идемпотентность
         if (Status == newStatus)
             return Result.Success();
 
+        // Допустимость смены статуса
         if (!AllowedTransitions.Contains((Status, newStatus)))
             return Result.Failure(ErrorsTicket.InvalidStatusTransition);
         
@@ -150,10 +179,12 @@ public class Ticket : AggregateRoot
 
     public Result ChangeType(TicketType newType)
     {
+        // Идемпотентность
         if (Type == newType)
             return Result.Success();
         
-        if (Status == TicketStatus.Completed || Status == TicketStatus.Rejected)
+        // Проверка статуса
+        if (Status is TicketStatus.Completed or TicketStatus.Rejected)
             return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
         
         Type = newType;
@@ -162,17 +193,25 @@ public class Ticket : AggregateRoot
         return Result.Success();
     }
     
-    private DateTime CalculateDeadline(TicketType type)
+    private static DateTime CalculateDeadline(TicketType type)
     {
         var now = DateTime.UtcNow;
 
         return type switch
         {
-            TicketType.Standart => now.AddDays(3),
+            TicketType.Standard => now.AddDays(3),
             TicketType.Urgent => now.AddDays(1),
             TicketType.Critical => now.AddHours(4),
             _ => now.AddDays(3)
         };
+    }
+
+    private Result CanManageExecutors()
+    {
+        if (Status is not TicketStatus.New and not TicketStatus.InProgress)
+            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
+
+        return Result.Success();
     }
     
     private static readonly HashSet<(TicketStatus From, TicketStatus To)> AllowedTransitions = new()
