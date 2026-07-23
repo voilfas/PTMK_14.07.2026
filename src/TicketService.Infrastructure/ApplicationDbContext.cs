@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Domain.Entities;
 
-namespace TicketService.Infrastructure.Persistence;
+namespace TicketService.Infrastructure;
 
 public class ApplicationDbContext : DbContext
 {
@@ -9,6 +9,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Position> Positions => Set<Position>();
+    public DbSet<TicketExecutor> TicketExecutors => Set<TicketExecutor>();
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
