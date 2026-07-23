@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace TicketService.Application;
 
@@ -11,7 +9,7 @@ public static class DependencyInjection
     {
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
         });
         
         return services;
