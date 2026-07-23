@@ -1,3 +1,6 @@
-﻿namespace TicketService.Application.UseCases.Positions.Commands.CreatePosition;
+﻿using MediatR;
+using TicketService.Domain.Common;
 
-public record CreatePositionCommand(string Name);
+namespace TicketService.Application.UseCases.Positions.Commands.CreatePosition;
+
+public record CreatePositionCommand(string Name) :  IRequest<Result<Guid>>;

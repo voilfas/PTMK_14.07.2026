@@ -1,4 +1,5 @@
-﻿using TicketService.Application.Abstractions;
+﻿using MediatR;
+using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Domain.Common;
@@ -7,7 +8,7 @@ using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Application.UseCases.Employees.Commands.CreateEmployee;
 
-public class CreateEmployeeHandler
+public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<Guid>>
 {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IUnitOfWork _unitOfWork;
