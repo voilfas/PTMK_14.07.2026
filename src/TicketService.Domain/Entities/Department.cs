@@ -10,11 +10,11 @@ public class Department : BaseEntity
     public CodeDepartment Code { get; private set; }
     public bool IsActive { get; private set; }
 
-    private Department(string name, string codeName)
+    private Department(string name, CodeDepartment code)
     {
         Id =  Guid.NewGuid();
         Name = name;
-        Code = CodeDepartment.Generate(codeName);
+        Code = code;
         IsActive = true;
     }
 
@@ -32,7 +32,10 @@ public class Department : BaseEntity
         if (code.Length is < 5 or > 15)
             return Result<Department>.Failure(ErrorsDepartment.IncorrectCode);
 
-        return Result<Department>.Success(new Department(name, code));
+        var departmentCode = CodeDepartment.Generate(code);
+
+        return Result<Department>.Success(
+            new Department(name, departmentCode));
     }
 
     public Result ChangeName(string newName)

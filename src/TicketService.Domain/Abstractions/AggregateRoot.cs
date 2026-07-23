@@ -1,10 +1,12 @@
-﻿using TicketService.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using TicketService.Domain.Entities;
 
 namespace TicketService.Domain.Abstractions;
 
 public abstract class AggregateRoot : BaseEntity
 {
     private readonly List<DomainEvent> _events = [];
+    [NotMapped]
     public IReadOnlyList<DomainEvent> Events => _events.AsReadOnly();
     
     protected void AddEvent(DomainEvent @event) 

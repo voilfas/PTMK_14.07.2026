@@ -2,7 +2,7 @@
 
 public record CodeDepartment
 {
-    private string Code { get; }
+    public string Code { get; }
 
     private CodeDepartment(string code)
     {
@@ -11,10 +11,13 @@ public record CodeDepartment
 
     public static CodeDepartment Generate(string codeName)
     {
-        //var guid = id.ToString("N");
-        
         var code = $"IT-{codeName[..3]}";
 
+        return new CodeDepartment(code);
+    }
+    
+    public static CodeDepartment FromDatabase(string code)
+    {
         return new CodeDepartment(code);
     }
     

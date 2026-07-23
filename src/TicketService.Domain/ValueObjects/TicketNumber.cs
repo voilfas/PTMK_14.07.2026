@@ -2,7 +2,7 @@
 
 public record TicketNumber
 {
-    private string Number { get; }
+    public string Number { get; }
 
     private TicketNumber(string number)
     {
@@ -15,6 +15,12 @@ public record TicketNumber
         
         var number = $"TICKET-{guid[..26]}";
 
+        return new TicketNumber(number);
+    }
+    
+    // Метод используется EF Core для восстановления из БД
+    public static TicketNumber FromDatabase(string number)
+    {
         return new TicketNumber(number);
     }
     
