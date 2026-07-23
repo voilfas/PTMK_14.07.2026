@@ -11,6 +11,8 @@ public class Employee :  BaseEntity
     public Guid DepartmentId { get; private set; }
     public Guid PositionId { get; private set; }
 
+    private Employee() { }
+    
     private Employee(FullName name, Guid departmentId, Guid positionId)
     {
         Id = Guid.NewGuid();

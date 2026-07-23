@@ -8,6 +8,8 @@ public class Position : BaseEntity
     public string Name { get; private set; }
     public bool IsActive { get; private set; }
     
+    private Position() { }
+    
     private Position(string name)
     {
         Id = Guid.NewGuid();

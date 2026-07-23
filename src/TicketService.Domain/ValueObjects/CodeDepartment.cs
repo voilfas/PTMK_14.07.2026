@@ -11,8 +11,6 @@ public record CodeDepartment
 
     public static CodeDepartment Generate(string codeName)
     {
-        //var guid = id.ToString("N");
-        
         var code = $"IT-{codeName[..3]}";
 
         return new CodeDepartment(code);
