@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TicketService.Domain.Entities;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Infrastructure.Configurations;
 
@@ -20,8 +21,12 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasMaxLength(30);
         
         builder.Property(d => d.Code)
-            .IsRequired()
-            .HasMaxLength(15);
+            .HasConversion(
+                code => code.Code,
+                value => CodeDepartment.FromDatabase(value))
+            .HasColumnName("code")
+            .HasMaxLength(15)
+            .IsRequired();
 
         builder.Property(d => d.IsActive)
             .IsRequired();
