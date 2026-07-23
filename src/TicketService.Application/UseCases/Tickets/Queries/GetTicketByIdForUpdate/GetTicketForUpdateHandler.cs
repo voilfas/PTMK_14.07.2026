@@ -1,11 +1,12 @@
-﻿using TicketService.Application.Abstractions.Persistence.Commands;
+﻿using MediatR;
+using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Application.DTOs;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetTicketByIdForUpdate;
 
-public class GetTicketForUpdateHandler
+public class GetTicketForUpdateHandler : IRequestHandler<GetTicketForUpdateQuery, Result<TicketDto>>
 {
     private readonly ITicketRepository _repository;
 

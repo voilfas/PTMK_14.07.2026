@@ -1,11 +1,12 @@
-﻿using TicketService.Application.Abstractions.Persistence.Queries;
+﻿using MediatR;
+using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Application.DTOs;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetTicketByIdRead;
 
-public class GetTicketByIdReadHandler
+public class GetTicketByIdReadHandler : IRequestHandler<GetTicketByIdReadQuery, Result<TicketDto>>
 {
     private readonly ITicketReadRepository _ticketReadRepository;
 

@@ -1,10 +1,11 @@
-﻿using TicketService.Application.Abstractions.Persistence.Queries;
+﻿using MediatR;
+using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetOverdueTickets;
 
-public class GetOverdueTicketsHandler
+public class GetOverdueTicketsHandler : IRequestHandler<GetOverdueTicketsQuery, PageResult<TicketDto>>
 {
     private readonly ITicketReadRepository _repository;
 

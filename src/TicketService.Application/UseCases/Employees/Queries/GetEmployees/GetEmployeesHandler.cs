@@ -1,10 +1,11 @@
-﻿using TicketService.Application.Abstractions.Persistence.Queries;
+﻿using MediatR;
+using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 
-public class GetEmployeesHandler
+public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, PageResult<EmployeeDto>>
 {
     private readonly IEmployeeReadRepository _repository;
 

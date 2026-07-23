@@ -1,4 +1,7 @@
-﻿namespace TicketService.Application.UseCases.Employees.Commands.CreateEmployee;
+﻿using MediatR;
+using TicketService.Domain.Common;
+
+namespace TicketService.Application.UseCases.Employees.Commands.CreateEmployee;
 
 public record CreateEmployeeCommand(
     string FirstName,
@@ -6,4 +9,4 @@ public record CreateEmployeeCommand(
     string Surname,
     Guid DepartmentId,
     Guid PositionId
-    );
+    ) : IRequest<Result<Guid>>;

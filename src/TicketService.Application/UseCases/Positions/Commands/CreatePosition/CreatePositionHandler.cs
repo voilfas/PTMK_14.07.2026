@@ -1,11 +1,12 @@
-﻿using TicketService.Application.Abstractions;
+﻿using MediatR;
+using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Domain.Common;
 using TicketService.Domain.Entities;
 
 namespace TicketService.Application.UseCases.Positions.Commands.CreatePosition;
 
-public class CreatePositionHandler
+public class CreatePositionHandler : IRequestHandler<CreatePositionCommand, Result<Guid>>
 {
     private readonly IPositionRepository _repository;
     private  readonly IUnitOfWork _unitOfWork;

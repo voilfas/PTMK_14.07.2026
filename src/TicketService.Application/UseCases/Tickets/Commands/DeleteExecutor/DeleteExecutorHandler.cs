@@ -1,11 +1,12 @@
-﻿using TicketService.Application.Abstractions;
+﻿using MediatR;
+using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
 
-public class DeleteExecutorHandler
+public class DeleteExecutorHandler : IRequestHandler<DeleteExecutorCommand, Result>
 {
     private readonly ITicketRepository _repository;
     private readonly IUnitOfWork _unitOfWork;

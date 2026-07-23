@@ -1,4 +1,5 @@
-﻿using TicketService.Application.Abstractions;
+﻿using MediatR;
+using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Domain.Common;
@@ -6,7 +7,7 @@ using TicketService.Domain.Entities;
 
 namespace TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
 
-public class CreateTicketHandler
+public class CreateTicketHandler : IRequestHandler<CreateTicketCommand, Result<Guid>>
 {
     private readonly ITicketRepository _repository;
     private readonly IUnitOfWork _unitOfWork;

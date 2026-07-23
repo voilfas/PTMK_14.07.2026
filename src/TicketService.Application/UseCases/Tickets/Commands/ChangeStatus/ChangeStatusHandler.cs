@@ -1,11 +1,12 @@
-﻿using TicketService.Application.Abstractions;
+﻿using MediatR;
+using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
 
-public class ChangeStatusHandler
+public class ChangeStatusHandler : IRequestHandler<ChangeStatusCommand, Result>
 {
     private readonly ITicketRepository _ticketRepository;
     private readonly IUnitOfWork _unitOfWork;
