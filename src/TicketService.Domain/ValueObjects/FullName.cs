@@ -5,9 +5,9 @@ namespace TicketService.Domain.ValueObjects;
 
 public record FullName
 {
-    private string FirstName { get; }
-    private string LastName { get; }
-    private string Surname { get; }
+    public string FirstName { get; }
+    public string LastName { get; }
+    public string Surname { get; }
 
     private FullName(string firstName, string lastName, string surname)
     {

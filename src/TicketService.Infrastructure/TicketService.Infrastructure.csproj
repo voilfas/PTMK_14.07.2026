@@ -14,10 +14,10 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.16" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.16" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Configurations\" />
       <Folder Include="DependencyInjection\" />
       <Folder Include="DomainEvents\" />
       <Folder Include="Repositories\" />

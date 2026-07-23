@@ -16,9 +16,11 @@ public class Ticket : AggregateRoot
     public DateTime Deadline { get; private set; }
     public TicketStatus Status { get; private set; }
     public TicketType Type { get; private set; }
-    
-    private readonly HashSet<Guid> _executorIds = [];
-    public IReadOnlyCollection<Guid> ExecutorIds => _executorIds;
+
+    private readonly List<TicketExecutor> _executors = [];
+    public IReadOnlyCollection<TicketExecutor> Executors => _executors.AsReadOnly();
+
+    private Ticket() {}
 
     private Ticket(
         Guid authorId,
@@ -27,14 +29,25 @@ public class Ticket : AggregateRoot
         TicketType type)
     {
         Id = Guid.NewGuid();
+
         TicketNumber = TicketNumber.Generate(Id);
+
         CreatedAt = DateTime.UtcNow;
-        AuthorId = authorId; 
+
+        AuthorId = authorId;
+
         Description = description;
-        Status = TicketStatus.New;
+
         Type = type;
+
         Deadline = CalculateDeadline(type);
-        _executorIds.UnionWith(executorIds);
+
+        Status = TicketStatus.New;
+
+        foreach (var executorId in executorIds.Distinct())
+        {
+            _executors.Add(new TicketExecutor(Id, executorId));
+        }
     }
 
     public static Result<Ticket> Create(
@@ -43,25 +56,17 @@ public class Ticket : AggregateRoot
         string description,
         TicketType type)
     {
-        // Пустой Guid автора
         if (authorId == Guid.Empty)
             return Result<Ticket>.Failure(ErrorsTicket.EmptyAuthorId);
 
-        // Пустой Guid у исполнителей
-        if (executorIds.Any(id => id == Guid.Empty))
-            return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
-
-        // Повторяющиеся Guid у исполнителей
-        if (executorIds.Distinct().Count() != executorIds.Count)
-            return Result<Ticket>.Failure(ErrorsTicket.DistinctExecutors);
-
-        // Пустое описание 
         if (string.IsNullOrWhiteSpace(description))
             return Result<Ticket>.Failure(ErrorsTicket.EmptyDescription);
 
-        // Невалидная длина описания
         if (description.Length is < 3 or > 300)
             return Result<Ticket>.Failure(ErrorsTicket.IncorrectDescription);
+
+        if (executorIds.Any(id => id == Guid.Empty))
+            return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
 
         return Result<Ticket>.Success(
             new Ticket(authorId, executorIds, description, type));
@@ -69,39 +74,32 @@ public class Ticket : AggregateRoot
 
     public Result AddExecutors(IReadOnlyCollection<Guid> executorIds)
     {
-        // Проверка на пустую коллекцию
         if (executorIds.Count == 0)
             return Result.Success();
-        
-        // Проверка на статус заявки
+
         var canManage = CanManageExecutors();
+
         if (canManage.IsFailure)
             return canManage;
 
-        // Проверка на повторяющиеся элементы в коллекции
-        var newExecutors = new HashSet<Guid>(executorIds);
-
-        if (newExecutors.Count != executorIds.Count)
-            return Result.Failure(ErrorsTicket.DistinctExecutors);
-        
-        // Проверка на Пустые Guid в коллекции
-        if (newExecutors.Any(id => id == Guid.Empty))
+        if (executorIds.Any(id => id == Guid.Empty))
             return Result.Failure(ErrorsTicket.EmptyExecutorId);
-        
-        // Проверка сколько уникальных Guid добавили в коллекцию
-        var addedExecutors = new List<Guid>();
 
-        foreach (var id in newExecutors)
+        var newExecutors = executorIds
+            .Distinct()
+            .Where(id => _executors.All(e => e.EmployeeId != id))
+            .ToList();
+
+        foreach (var executorId in newExecutors)
         {
-            if(_executorIds.Add(id))
-                addedExecutors.Add(id);
+            _executors.Add(new TicketExecutor(Id, executorId));
         }
-        
-        if (addedExecutors.Count == 0)
-            return Result.Success();
-        
-        AddEvent(new TicketExecutorAddListEvent(Id, addedExecutors));
-        
+
+        if (newExecutors.Count > 0)
+        {
+            AddEvent(new TicketExecutorAddListEvent(Id, newExecutors));
+        }
+
         return Result.Success();
     }
 
@@ -109,90 +107,101 @@ public class Ticket : AggregateRoot
         Guid oldExecutorId,
         Guid newExecutorId)
     {
-        // Индемпотентность Guid-ов
+        if (oldExecutorId == Guid.Empty || newExecutorId == Guid.Empty)
+            return Result.Failure(ErrorsTicket.EmptyExecutorId);
+
         if (oldExecutorId == newExecutorId)
             return Result.Success();
-        
-        // Пустой Guid
-        if (oldExecutorId == Guid.Empty ||  newExecutorId == Guid.Empty)
-            return Result.Failure(ErrorsTicket.EmptyExecutorId);
-        
-        // Статус заявки
+
         var canManage = CanManageExecutors();
+
         if (canManage.IsFailure)
             return canManage;
-        
-        // Старого Guid не найдено в коллекции
-        if (!_executorIds.Contains(oldExecutorId))
+
+        var oldExecutor = _executors
+            .FirstOrDefault(e => e.EmployeeId == oldExecutorId);
+
+        if (oldExecutor is null)
             return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
-        
-        // Новый Guid уже содержится в коллекции
-        if (_executorIds.Contains(newExecutorId))
+
+        if (_executors.Any(e => e.EmployeeId == newExecutorId))
             return Result.Failure(ErrorsTicket.ExecutorAlreadyExist);
-        
-        _executorIds.Remove(oldExecutorId);
-        _executorIds.Add(newExecutorId);
-        
-        AddEvent(new TicketExecutorChangedEvent(Id, oldExecutorId, newExecutorId));
-        
+
+        _executors.Remove(oldExecutor);
+
+        _executors.Add(new TicketExecutor(Id, newExecutorId));
+
+        AddEvent(new TicketExecutorChangedEvent(
+            Id,
+            oldExecutorId,
+            newExecutorId));
+
         return Result.Success();
     }
 
     public Result DeleteExecutor(Guid executorId)
     {
-        // Пустой Guid
         if (executorId == Guid.Empty)
             return Result.Failure(ErrorsTicket.EmptyExecutorId);
-        
-        // Не найден Guid в коллекции
-        if (!_executorIds.Contains(executorId))
-            return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
-        
-        // Проверка на статус заявки
+
         var canManage = CanManageExecutors();
+
         if (canManage.IsFailure)
             return canManage;
-        
-        _executorIds.Remove(executorId);
-        
+
+        var executor = _executors
+            .FirstOrDefault(e => e.EmployeeId == executorId);
+
+        if (executor is null)
+            return Result.Failure(ErrorsTicket.ExecutorDoesNotExist);
+
+        _executors.Remove(executor);
+
         AddEvent(new TicketExecutorRemoveEvent(Id, executorId));
-        
+
         return Result.Success();
     }
-    
+
     public Result ChangeStatus(TicketStatus newStatus)
     {
-        // Идемпотентность
         if (Status == newStatus)
             return Result.Success();
 
-        // Допустимость смены статуса
         if (!AllowedTransitions.Contains((Status, newStatus)))
             return Result.Failure(ErrorsTicket.InvalidStatusTransition);
-        
+
         var oldStatus = Status;
+
         Status = newStatus;
+
         AddEvent(new TicketStatusChangedEvent(Id, oldStatus, newStatus));
-        
+
         return Result.Success();
     }
 
     public Result ChangeType(TicketType newType)
     {
-        // Идемпотентность
         if (Type == newType)
             return Result.Success();
-        
-        // Проверка статуса
+
         if (Status is TicketStatus.Completed or TicketStatus.Rejected)
             return Result.Failure(ErrorsTicket.CompletedOrRejectedTicketStatus);
-        
+
         Type = newType;
+
         Deadline = CalculateDeadline(newType);
-        
+
         return Result.Success();
     }
-    
+
+    private Result CanManageExecutors()
+    {
+        if (Status is not TicketStatus.New and not TicketStatus.InProgress)
+            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
+
+        return Result.Success();
+    }
+
     private static DateTime CalculateDeadline(TicketType type)
     {
         var now = DateTime.UtcNow;
@@ -206,21 +215,13 @@ public class Ticket : AggregateRoot
         };
     }
 
-    private Result CanManageExecutors()
-    {
-        if (Status is not TicketStatus.New and not TicketStatus.InProgress)
-            return Result.Failure(ErrorsTicket.CannotChangeExecutorsInCurrentStatus);
-
-        return Result.Success();
-    }
-    
-    private static readonly HashSet<(TicketStatus From, TicketStatus To)> AllowedTransitions = new()
-    {
+    private static readonly HashSet<(TicketStatus From, TicketStatus To)> AllowedTransitions =
+    [
         (TicketStatus.New, TicketStatus.AwaitingApproval),
         (TicketStatus.AwaitingApproval, TicketStatus.Approved),
         (TicketStatus.AwaitingApproval, TicketStatus.Rejected),
         (TicketStatus.Rejected, TicketStatus.New),
         (TicketStatus.Approved, TicketStatus.InProgress),
-        (TicketStatus.InProgress, TicketStatus.Completed),
-    };
+        (TicketStatus.InProgress, TicketStatus.Completed)
+    ];
 }
