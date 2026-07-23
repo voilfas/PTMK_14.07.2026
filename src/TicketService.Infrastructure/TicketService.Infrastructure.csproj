@@ -12,4 +12,16 @@
       <ProjectReference Include="..\Ticket.Domain\Ticket.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.16" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configurations\" />
+      <Folder Include="DependencyInjection\" />
+      <Folder Include="DomainEvents\" />
+      <Folder Include="Repositories\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>
