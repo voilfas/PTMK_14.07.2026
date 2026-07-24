@@ -26,7 +26,7 @@ public sealed class DepartmentReadRepository : IDepartmentReadRepository
             .Take(pageSize)
             .Select(d => new DepartmentDto(
                 d.Name,
-                d.Code.Code,
+                d.Code.Value,
                 d.IsActive))
             .ToListAsync(cancellationToken);
         

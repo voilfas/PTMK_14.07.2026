@@ -22,7 +22,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         
         builder.Property(d => d.Code)
             .HasConversion(
-                code => code.Code,
+                code => code.Value,
                 value => CodeDepartment.FromDatabase(value))
             .HasColumnName("code")
             .HasMaxLength(15)

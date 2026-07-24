@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Domain.Entities;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;
 
@@ -21,5 +22,13 @@ public sealed class DepartmentRepository : IDepartmentRepository
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Departments.AnyAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<CodeDepartment?> GetLastCodeAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.Departments
+            .OrderByDescending(d => d.Code)
+            .Select(d => d.Code)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

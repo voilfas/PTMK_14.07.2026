@@ -2,18 +2,32 @@
 
 public record CodeDepartment
 {
-    public string Code { get; }
+    public string Value { get; }
 
-    private CodeDepartment(string code)
+    private CodeDepartment(string value)
     {
-        Code = code;
+        Value = value;
     }
 
-    public static CodeDepartment Generate(string codeName)
+    public static CodeDepartment GenerateNext(CodeDepartment? code)
     {
-        var code = $"IT-{codeName[..3]}";
-
-        return new CodeDepartment(code);
+        if (code is null)
+            return new CodeDepartment("IT-0001");
+        
+        var lastCode = code.Value;
+        
+        int firstDigitIndex = lastCode.IndexOfAny(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+        
+        string prefix = lastCode[..firstDigitIndex];
+        string digitsPart = lastCode[firstDigitIndex..];
+        
+        int nextNumber = int.Parse(digitsPart) + 1;
+        
+        string newDigitsPart = nextNumber.ToString().PadLeft(digitsPart.Length, '0');
+        
+        var newCode = $"{prefix}{newDigitsPart}";
+        
+        return new CodeDepartment(newCode);
     }
     
     public static CodeDepartment FromDatabase(string code)
@@ -21,5 +35,5 @@ public record CodeDepartment
         return new CodeDepartment(code);
     }
     
-    public override string ToString() => Code;
+    public override string ToString() => Value;
 }

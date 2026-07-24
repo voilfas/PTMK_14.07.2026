@@ -4,6 +4,7 @@ using TicketService.Application.Abstractions.Persistence;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Domain.Common;
 using TicketService.Domain.Entities;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Application.UseCases.Departments.Commands.CreateDepartment;
 
@@ -22,9 +23,13 @@ public class CreateDepartmentHandler : IRequestHandler<CreateDepartmentCommand, 
         CreateDepartmentCommand command,
         CancellationToken cancellationToken)
     {
+        var lastCode = await _repository.GetLastCodeAsync(cancellationToken);
+        
+        var nextCode = CodeDepartment.GenerateNext(lastCode);
+        
         var departmentResult = Department.Create(
             command.Name,
-            command.Code);
+            nextCode);
 
         if (departmentResult.IsFailure)
             return Result<Guid>.Failure(departmentResult.Error);
