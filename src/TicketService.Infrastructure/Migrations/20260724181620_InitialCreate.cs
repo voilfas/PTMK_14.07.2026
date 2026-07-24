@@ -15,54 +15,54 @@ namespace TicketService.Infrastructure.Migrations
                 name: "departments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     code = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    is_active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_departments", x => x.Id);
+                    table.PrimaryKey("PK_departments", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "positions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_positions", x => x.Id);
+                    table.PrimaryKey("PK_positions", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "employees",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     first_name = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     last_name = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     surname = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PositionId = table.Column<Guid>(type: "uuid", nullable: false)
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    position_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_employees", x => x.Id);
+                    table.PrimaryKey("PK_employees", x => x.id);
                     table.ForeignKey(
-                        name: "FK_employees_departments_DepartmentId",
-                        column: x => x.DepartmentId,
+                        name: "FK_employees_departments_department_id",
+                        column: x => x.department_id,
                         principalTable: "departments",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_employees_positions_PositionId",
-                        column: x => x.PositionId,
+                        name: "FK_employees_positions_position_id",
+                        column: x => x.position_id,
                         principalTable: "positions",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -70,23 +70,23 @@ namespace TicketService.Infrastructure.Migrations
                 name: "tickets",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     ticket_number = table.Column<string>(type: "char(33)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    Deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false)
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    author_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tickets", x => x.Id);
+                    table.PrimaryKey("PK_tickets", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tickets_employees_AuthorId",
-                        column: x => x.AuthorId,
+                        name: "FK_tickets_employees_author_id",
+                        column: x => x.author_id,
                         principalTable: "employees",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -94,23 +94,23 @@ namespace TicketService.Infrastructure.Migrations
                 name: "ticket_executors",
                 columns: table => new
                 {
-                    TicketId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ticket_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    employee_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ticket_executors", x => new { x.TicketId, x.EmployeeId });
+                    table.PrimaryKey("PK_ticket_executors", x => new { x.ticket_id, x.employee_id });
                     table.ForeignKey(
-                        name: "FK_ticket_executors_employees_EmployeeId",
-                        column: x => x.EmployeeId,
+                        name: "FK_ticket_executors_employees_employee_id",
+                        column: x => x.employee_id,
                         principalTable: "employees",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ticket_executors_tickets_TicketId",
-                        column: x => x.TicketId,
+                        name: "FK_ticket_executors_tickets_ticket_id",
+                        column: x => x.ticket_id,
                         principalTable: "tickets",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -121,45 +121,45 @@ namespace TicketService.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_employees_DepartmentId",
+                name: "IX_employees_department_id",
                 table: "employees",
-                column: "DepartmentId");
+                column: "department_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_employees_PositionId",
+                name: "IX_employees_position_id",
                 table: "employees",
-                column: "PositionId");
+                column: "position_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_positions_Name",
+                name: "IX_positions_name",
                 table: "positions",
-                column: "Name",
+                column: "name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ticket_executors_EmployeeId",
+                name: "IX_ticket_executors_employee_id",
                 table: "ticket_executors",
-                column: "EmployeeId");
+                column: "employee_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tickets_AuthorId",
+                name: "IX_tickets_author_id",
                 table: "tickets",
-                column: "AuthorId");
+                column: "author_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tickets_CreatedAt",
+                name: "IX_tickets_created_at",
                 table: "tickets",
-                column: "CreatedAt");
+                column: "created_at");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tickets_Deadline",
+                name: "IX_tickets_deadline",
                 table: "tickets",
-                column: "Deadline");
+                column: "deadline");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tickets_Status",
+                name: "IX_tickets_status",
                 table: "tickets",
-                column: "Status");
+                column: "status");
 
             migrationBuilder.CreateIndex(
                 name: "IX_tickets_ticket_number",
@@ -168,9 +168,9 @@ namespace TicketService.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_tickets_Type",
+                name: "IX_tickets_type",
                 table: "tickets",
-                column: "Type");
+                column: "type");
         }
 
         /// <inheritdoc />

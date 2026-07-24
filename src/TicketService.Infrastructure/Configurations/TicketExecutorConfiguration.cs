@@ -21,9 +21,15 @@ public class TicketExecutorConfiguration : IEntityTypeConfiguration<TicketExecut
             .HasForeignKey(x => x.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(t => t.TicketId)
+            .HasColumnName("ticket_id");
+
         builder.HasOne<Ticket>()
             .WithMany(t => t.Executors)
             .HasForeignKey(x => x.TicketId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(t => t.EmployeeId)
+            .HasColumnName("employee_id");
     }
 }

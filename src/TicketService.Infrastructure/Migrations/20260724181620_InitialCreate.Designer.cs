@@ -12,7 +12,7 @@ using TicketService.Infrastructure;
 namespace TicketService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260723142416_InitialCreate")]
+    [Migration("20260724181620_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -28,7 +28,8 @@ namespace TicketService.Infrastructure.Migrations
             modelBuilder.Entity("TicketService.Domain.Entities.Department", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -37,12 +38,14 @@ namespace TicketService.Infrastructure.Migrations
                         .HasColumnName("code");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
@@ -55,13 +58,16 @@ namespace TicketService.Infrastructure.Migrations
             modelBuilder.Entity("TicketService.Domain.Entities.Employee", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("department_id");
 
                     b.Property<Guid>("PositionId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("position_id");
 
                     b.HasKey("Id");
 
@@ -75,15 +81,18 @@ namespace TicketService.Infrastructure.Migrations
             modelBuilder.Entity("TicketService.Domain.Entities.Position", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
@@ -96,25 +105,31 @@ namespace TicketService.Infrastructure.Migrations
             modelBuilder.Entity("TicketService.Domain.Entities.Ticket", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<DateTime>("Deadline")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deadline");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("description");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
                     b.Property<string>("TicketNumber")
                         .IsRequired()
@@ -123,7 +138,8 @@ namespace TicketService.Infrastructure.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("type");
 
                     b.HasKey("Id");
 
@@ -146,10 +162,12 @@ namespace TicketService.Infrastructure.Migrations
             modelBuilder.Entity("TicketService.Domain.Entities.TicketExecutor", b =>
                 {
                     b.Property<Guid>("TicketId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("ticket_id");
 
                     b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("employee_id");
 
                     b.HasKey("TicketId", "EmployeeId");
 

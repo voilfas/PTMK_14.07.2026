@@ -14,9 +14,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.HasKey(d => d.Id);
         
         builder.Property(d => d.Id)
+            .HasColumnName("id")
             .ValueGeneratedNever();
         
         builder.Property(d => d.Name)
+            .HasColumnName("name")
             .IsRequired()
             .HasMaxLength(30);
         
@@ -29,6 +31,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired();
 
         builder.Property(d => d.IsActive)
+            .HasColumnName("is_active")
             .IsRequired();
         
         builder.HasIndex(d => d.Code).IsUnique();
