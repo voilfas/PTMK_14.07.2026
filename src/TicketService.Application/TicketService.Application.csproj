@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ticket.Domain\Ticket.Domain.csproj" />
       <ProjectReference Include="..\TicketService.Domain\TicketService.Domain.csproj" />
     </ItemGroup>
 
@@ -16,6 +15,11 @@
       <Folder Include="UseCases\Departments\Commands\" />
       <Folder Include="UseCases\Employees\Commands\" />
       <Folder Include="UseCases\Positions\Commands\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="12.5.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.16" />
     </ItemGroup>
 
 </Project>
