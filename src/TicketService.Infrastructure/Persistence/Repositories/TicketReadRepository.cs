@@ -77,6 +77,7 @@ public class TicketReadRepository : ITicketReadRepository
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
             .Select(t => new TicketListItemDto(
+                t.Id,
                 t.TicketNumber.Number,
                 t.Description,
                 t.Status,
@@ -106,6 +107,7 @@ public class TicketReadRepository : ITicketReadRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(t => new TicketListItemDto(
+                t.Id,
                 t.TicketNumber.Number,
                 t.Description,
                 t.Status,

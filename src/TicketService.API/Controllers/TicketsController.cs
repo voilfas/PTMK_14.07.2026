@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
+using TicketService.API.RequestDTOs.Tickets;
 using TicketService.Application.UseCases.Employees.Commands.ChangeExecutor;
 using TicketService.Application.UseCases.Tickets.Commands.AddExecutors;
 using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
@@ -95,9 +96,14 @@ public class TicketsController : ControllerBase
     [HttpPost("{id:guid}/executors")]
     public async Task<IActionResult> AddExecutors(
         Guid id,
-        [FromBody] AddExecutorsCommand command,
+        [FromBody] AddExecutorsRequest request,
+        /*[FromBody] AddExecutorsCommand command*/
         CancellationToken cancellationToken)
     {
+        var command = new AddExecutorsCommand(
+            id, 
+            request.ExecutorsIds);
+        
         var result = await _sender.Send(
             command with { TicketId = id },
             cancellationToken);

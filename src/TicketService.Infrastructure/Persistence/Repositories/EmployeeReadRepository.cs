@@ -43,6 +43,7 @@ public sealed class EmployeeReadRepository : IEmployeeReadRepository
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
             .Select(e => new EmployeeListItemDto(
+                e.Id,
                 e.FullName.ToString(),
                 e.Department.Name,
                 e.Position.Name))
