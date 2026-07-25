@@ -5,5 +5,7 @@ public sealed record EmployeeDto(
     string LastName,
     string Surname,
     Guid DepartmentId,
-    Guid PositionId
+    string DepartmentName,
+    Guid PositionId,
+    string PositionName
     );

@@ -14,6 +14,7 @@ public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, PageResult
         _repository = repository;
     }
 
+    
     public async Task<PageResult<EmployeeDto>> Handle(
         GetEmployeesQuery query,
         CancellationToken cancellationToken)

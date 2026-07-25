@@ -46,7 +46,9 @@ public sealed class EmployeeReadRepository : IEmployeeReadRepository
                 e.FullName.LastName,
                 e.FullName.Surname,
                 e.DepartmentId,
-                e.PositionId))
+                e.Department.Name,
+                e.PositionId,
+                e.Position.Name))
             .ToListAsync(cancellationToken);
         
         return new PageResult<EmployeeDto>
