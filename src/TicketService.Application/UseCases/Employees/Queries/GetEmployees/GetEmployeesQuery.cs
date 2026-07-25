@@ -4,4 +4,4 @@ using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 
-public record GetEmployeesQuery(EmployeeFilter Filter) :  IRequest<PageResult<EmployeeDto>>;
+public record GetEmployeesQuery(EmployeeFilter Filter) :  IRequest<PageResult<EmployeeListItemDto>>;

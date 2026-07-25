@@ -42,7 +42,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
             .HasColumnName("created_at")
             .IsRequired();
         
-        builder.HasOne<Employee>()
+        builder.HasOne(t => t.Author)
             .WithMany()
             .HasForeignKey(t => t.AuthorId)
             .IsRequired()
@@ -71,7 +71,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
             .IsRequired();
         
         builder.HasMany(t => t.Executors)
-            .WithOne()
+            .WithOne(te => te.Ticket)
             .HasForeignKey(te => te.TicketId)
             .OnDelete(DeleteBehavior.Cascade);
         

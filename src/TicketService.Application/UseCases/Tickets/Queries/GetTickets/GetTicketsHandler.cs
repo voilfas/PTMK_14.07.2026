@@ -5,7 +5,7 @@ using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 
-public class GetTicketsHandler : IRequestHandler<GetTicketsQuery, PageResult<TicketDto>>
+public class GetTicketsHandler : IRequestHandler<GetTicketsQuery, PageResult<TicketListItemDto>>
 {
     private readonly ITicketReadRepository _ticketReadRepository;
 
@@ -14,7 +14,7 @@ public class GetTicketsHandler : IRequestHandler<GetTicketsQuery, PageResult<Tic
         _ticketReadRepository = ticketReadRepository;
     }
 
-    public async Task<PageResult<TicketDto>> Handle(
+    public async Task<PageResult<TicketListItemDto>> Handle(
         GetTicketsQuery query,
         CancellationToken cancellationToken)
     {

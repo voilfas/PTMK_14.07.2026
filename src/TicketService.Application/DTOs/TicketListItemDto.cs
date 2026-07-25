@@ -2,12 +2,9 @@
 
 namespace TicketService.Application.DTOs;
 
-public sealed record TicketDto(
-    Guid Id,
+public sealed record TicketListItemDto(
     string Number,
     string Description,
     TicketStatus Status,
-    DateTime Deadline/*,
-    DateTime CreatedAt,
-    EmployeeDto Author,
-    IReadOnlyCollection<EmployeeDto> Executors*/);
+    DateTime Deadline,
+    DateTime CreatedAt);

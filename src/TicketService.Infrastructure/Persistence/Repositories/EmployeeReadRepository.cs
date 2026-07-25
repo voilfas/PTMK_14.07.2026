@@ -3,6 +3,7 @@ using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
+using TicketService.Domain.Entities;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;
 
@@ -15,7 +16,7 @@ public sealed class EmployeeReadRepository : IEmployeeReadRepository
         _dbContext = dbContext;
     }
     
-    public async Task<PageResult<EmployeeDto>> GetAllAsync(EmployeeFilter filter, CancellationToken cancellationToken = default)
+    public async Task<PageResult<EmployeeListItemDto>> GetAllAsync(EmployeeFilter filter, CancellationToken cancellationToken = default)
     {
         var query = _dbContext.Employees.AsNoTracking();
 
@@ -41,7 +42,28 @@ public sealed class EmployeeReadRepository : IEmployeeReadRepository
             .ThenBy(e => e.FullName.Surname)
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
+            .Select(e => new EmployeeListItemDto(
+                e.FullName.ToString(),
+                e.Department.Name,
+                e.Position.Name))
+            .ToListAsync(cancellationToken);
+        
+        return new PageResult<EmployeeListItemDto>
+        {
+            Items = employees,
+            Page = filter.Page,
+            PageSize = filter.PageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    public async Task<EmployeeDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Employees
+            .AsNoTracking()
+            .Where(e => e.Id == id)
             .Select(e => new EmployeeDto(
+                e.Id,
                 e.FullName.FirstName,
                 e.FullName.LastName,
                 e.FullName.Surname,
@@ -49,14 +71,6 @@ public sealed class EmployeeReadRepository : IEmployeeReadRepository
                 e.Department.Name,
                 e.PositionId,
                 e.Position.Name))
-            .ToListAsync(cancellationToken);
-        
-        return new PageResult<EmployeeDto>
-        {
-            Items = employees,
-            Page = filter.Page,
-            PageSize = filter.PageSize,
-            TotalCount = totalCount
-        };
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }
