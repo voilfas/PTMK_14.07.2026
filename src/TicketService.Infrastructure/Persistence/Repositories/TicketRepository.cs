@@ -20,7 +20,9 @@ public sealed class TicketRepository : ITicketRepository
 
     public async Task<Ticket?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Tickets.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
+        return await _dbContext.Tickets
+            .Include(t => t.Executors)
+            .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
