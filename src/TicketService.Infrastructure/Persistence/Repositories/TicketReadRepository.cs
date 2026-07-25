@@ -3,6 +3,7 @@ using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;
 
@@ -70,6 +71,21 @@ public class TicketReadRepository : ITicketReadRepository
         if (filter.DeadlineTo is not null)
             query = query.Where(t => t.Deadline <= filter.DeadlineTo);
         
+        if (filter.IsOverdue == true)
+            query = query.Where(t => t.Deadline < DateTime.UtcNow);
+        else if (filter.IsOverdue == false)
+            query = query.Where(t => t.Deadline >= DateTime.UtcNow);
+
+        if (!string.IsNullOrWhiteSpace(filter.DepartmentCode))
+        {
+            var departmentCode = CodeDepartment.FromDatabase(filter.DepartmentCode);
+
+            query = query.Where(t =>
+                t.Executors.Any(te =>
+                    te.Employee.Department.Code == departmentCode));
+        }
+        
+        
         var totalCount = await query.CountAsync(cancellationToken);
         
         var tickets = await query
@@ -90,36 +106,6 @@ public class TicketReadRepository : ITicketReadRepository
             Items = tickets,
             Page = filter.Page,
             PageSize = filter.PageSize,
-            TotalCount = totalCount
-        };
-    }
-
-    public async Task<PageResult<TicketListItemDto>> GetOverdueAsync(int page, int pageSize, CancellationToken cancellationToken)
-    {
-        var query = _dbContext.Tickets
-            .AsNoTracking()
-            .Where(t => t.Deadline <= DateTime.UtcNow);
-
-        var totalCount = await query.CountAsync(cancellationToken);
-        
-        var tickets = await query
-            .OrderBy(t => t.Deadline)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(t => new TicketListItemDto(
-                t.Id,
-                t.TicketNumber.Number,
-                t.Description,
-                t.Status,
-                t.Deadline,
-                t.CreatedAt))
-            .ToListAsync(cancellationToken);
-
-        return new PageResult<TicketListItemDto>
-        {
-            Items = tickets,
-            Page = page,
-            PageSize = pageSize,
             TotalCount = totalCount
         };
     }

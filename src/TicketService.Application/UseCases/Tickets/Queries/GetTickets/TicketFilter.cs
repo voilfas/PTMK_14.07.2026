@@ -1,5 +1,6 @@
 ﻿using TicketService.Application.Common;
 using TicketService.Domain.Enums;
+using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 
@@ -11,5 +12,7 @@ public record TicketFilter(
     DateTime? CreatedFrom,
     DateTime? CreatedTo,
     DateTime? DeadlineFrom,
-    DateTime? DeadlineTo
+    DateTime? DeadlineTo,
+    bool? IsOverdue,
+    string? DepartmentCode
     ) : PageQuery;
