@@ -4,19 +4,19 @@ using TicketService.Application.Common.ErrorsHandler;
 using TicketService.Application.DTOs;
 using TicketService.Domain.Common;
 
-namespace TicketService.Application.UseCases.Tickets.Queries.GetTicketByIdRead;
+namespace TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
 
-public class GetTicketByIdReadHandler : IRequestHandler<GetTicketByIdReadQuery, Result<TicketDto>>
+public class GetTicketByIdHandler : IRequestHandler<GetTicketByIdQuery, Result<TicketDto>>
 {
     private readonly ITicketReadRepository _ticketReadRepository;
 
-    public GetTicketByIdReadHandler(ITicketReadRepository ticketReadRepository)
+    public GetTicketByIdHandler(ITicketReadRepository ticketReadRepository)
     {
         _ticketReadRepository = ticketReadRepository;
     }
 
     public async Task<Result<TicketDto>> Handle(
-        GetTicketByIdReadQuery query,
+        GetTicketByIdQuery query,
         CancellationToken cancellationToken)
     {
         var ticket = await _ticketReadRepository.GetByIdAsync(query.Id, cancellationToken);

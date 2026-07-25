@@ -9,10 +9,10 @@ public class Result
     protected Result(bool isSuccess, Error? error)
     {
         if (isSuccess && error is not null)
-            throw new ArgumentException("Success and Error!");
-        
+            throw new ArgumentException("Success result cannot contain an error.");
+
         if (!isSuccess && error is null)
-            throw new ArgumentException("Not Success and Not Error!");
+            throw new ArgumentException("Failure result must contain an error.");
         
         IsSuccess = isSuccess;
         Error = error;

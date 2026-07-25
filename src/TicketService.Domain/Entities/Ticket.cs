@@ -12,6 +12,7 @@ public class Ticket : AggregateRoot
     public TicketNumber TicketNumber { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public Guid AuthorId { get; private set; }
+    public Employee Author { get; private set; } = null!;
     public string Description { get; private set; }
     public DateTime Deadline { get; private set; }
     public TicketStatus Status { get; private set; }

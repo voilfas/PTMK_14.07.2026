@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
+using TicketService.API.RequestDTOs.Tickets;
 using TicketService.Application.UseCases.Employees.Commands.ChangeExecutor;
 using TicketService.Application.UseCases.Tickets.Commands.AddExecutors;
 using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
 using TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
 using TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
 using TicketService.Application.UseCases.Tickets.Queries.GetOverdueTickets;
-using TicketService.Application.UseCases.Tickets.Queries.GetTicketByIdRead;
+using TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 
 namespace TicketService.API.Controllers;
@@ -45,7 +46,7 @@ public class TicketsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetTicketByIdReadQuery(id),
+            new GetTicketByIdQuery(id),
             cancellationToken);
 
         if (result.IsFailure)
@@ -95,9 +96,14 @@ public class TicketsController : ControllerBase
     [HttpPost("{id:guid}/executors")]
     public async Task<IActionResult> AddExecutors(
         Guid id,
-        [FromBody] AddExecutorsCommand command,
+        [FromBody] AddExecutorsRequest request,
+        /*[FromBody] AddExecutorsCommand command*/
         CancellationToken cancellationToken)
     {
+        var command = new AddExecutorsCommand(
+            id, 
+            request.ExecutorsIds);
+        
         var result = await _sender.Send(
             command with { TicketId = id },
             cancellationToken);

@@ -13,6 +13,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id)
+            .HasColumnName("id")
             .ValueGeneratedNever();
 
         builder.OwnsOne(e => e.FullName, fullName =>
@@ -40,6 +41,9 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .HasForeignKey(e => e.DepartmentId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(e => e.DepartmentId)
+            .HasColumnName("department_id");
         
         builder.HasOne<Position>()
             .WithMany()
@@ -47,8 +51,21 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(e => e.PositionId)
+            .HasColumnName("position_id");
+
         builder.HasIndex(e => e.DepartmentId);
         
         builder.HasIndex(e => e.PositionId);
+        
+        builder.HasOne(e => e.Department)
+            .WithMany()
+            .HasForeignKey(e => e.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(e => e.Position)
+            .WithMany()
+            .HasForeignKey(e => e.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

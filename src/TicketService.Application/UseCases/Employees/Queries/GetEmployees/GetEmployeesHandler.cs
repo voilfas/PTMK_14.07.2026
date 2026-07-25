@@ -5,7 +5,7 @@ using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 
-public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, PageResult<EmployeeDto>>
+public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, PageResult<EmployeeListItemDto>>
 {
     private readonly IEmployeeReadRepository _repository;
 
@@ -14,7 +14,8 @@ public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, PageResult
         _repository = repository;
     }
 
-    public async Task<PageResult<EmployeeDto>> Handle(
+    
+    public async Task<PageResult<EmployeeListItemDto>> Handle(
         GetEmployeesQuery query,
         CancellationToken cancellationToken)
     {

@@ -1,10 +1,13 @@
-﻿using TicketService.Domain.Enums;
+﻿namespace TicketService.Application.DTOs;
 
-namespace TicketService.Application.DTOs;
-
-public sealed record TicketDto(
-    Guid Id,
-    string Number,
+public record TicketDto(
+    Guid TicketId,
+    string TicketNumber,
+    string Status,
+    Guid AuthorId,
+    string AuthorName,
     string Description,
-    TicketStatus Status,
-    DateTime Deadline);
+    string Type,
+    DateTime CreatedAt,
+    DateTime Deadline,
+    IReadOnlyCollection<EmployeeListItemForTicketDto> Executors);

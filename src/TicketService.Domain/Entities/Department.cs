@@ -18,24 +18,16 @@ public class Department : BaseEntity
         IsActive = true;
     }
 
-    public static Result<Department> Create(string name, string code)
+    public static Result<Department> Create(string name, CodeDepartment code)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Result<Department>.Failure(ErrorsDepartment.EmptyName);
 
-        if (string.IsNullOrWhiteSpace(code))
-            return Result<Department>.Failure(ErrorsDepartment.EmptyCode);
-
         if (name.Length is < 2 or > 30)
             return Result<Department>.Failure(ErrorsDepartment.IncorrectName);
 
-        if (code.Length is < 5 or > 15)
-            return Result<Department>.Failure(ErrorsDepartment.IncorrectCode);
-
-        var departmentCode = CodeDepartment.Generate(code);
-
         return Result<Department>.Success(
-            new Department(name, departmentCode));
+            new Department(name, code));
     }
 
     public Result ChangeName(string newName)

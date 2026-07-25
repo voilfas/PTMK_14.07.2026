@@ -16,14 +16,20 @@ public class TicketExecutorConfiguration : IEntityTypeConfiguration<TicketExecut
             x.EmployeeId
         });
 
-        builder.HasOne<Employee>()
+        builder.HasOne(te => te.Employee)
             .WithMany()
-            .HasForeignKey(x => x.EmployeeId)
+            .HasForeignKey(te => te.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Ticket>()
+        builder.Property(t => t.TicketId)
+            .HasColumnName("ticket_id");
+
+        builder.HasOne(te => te.Ticket)
             .WithMany(t => t.Executors)
-            .HasForeignKey(x => x.TicketId)
+            .HasForeignKey(te => te.TicketId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(t => t.EmployeeId)
+            .HasColumnName("employee_id");
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
 using TicketService.Application.UseCases.Employees.Commands.CreateEmployee;
+using TicketService.Application.UseCases.Employees.Queries.GetEmployeeById;
 using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 
 namespace TicketService.API.Controllers;
@@ -32,7 +33,21 @@ public class EmployeesController : ControllerBase
             new { id = result.Value },
             result.Value);
     }
-
+    
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetEmployeeByIdQuery(id), cancellationToken);
+        
+        if (result.IsFailure)
+            return this.Problem(result.Error);
+        
+        return Ok(result.Value);
+    }
+    
+    
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] EmployeeFilter filter,

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
 using TicketService.Application.UseCases.Positions.Commands.CreatePosition;
 using TicketService.Application.UseCases.Positions.Queries;
+using TicketService.Application.UseCases.Positions.Queries.GetPositions;
 
 namespace TicketService.API.Controllers;
 

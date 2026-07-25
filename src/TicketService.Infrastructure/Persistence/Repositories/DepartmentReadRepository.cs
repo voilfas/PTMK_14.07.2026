@@ -21,12 +21,12 @@ public sealed class DepartmentReadRepository : IDepartmentReadRepository
         var totalCount = await query.CountAsync(cancellationToken);
 
         var departments = await query
-            .OrderBy(d => d.Name)
+            .OrderBy(d => d.Code)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(d => new DepartmentDto(
                 d.Name,
-                d.Code.Code,
+                d.Code.Value,
                 d.IsActive))
             .ToListAsync(cancellationToken);
         

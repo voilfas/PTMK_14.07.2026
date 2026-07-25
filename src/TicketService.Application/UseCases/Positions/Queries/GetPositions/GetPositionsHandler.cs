@@ -3,7 +3,7 @@ using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 
-namespace TicketService.Application.UseCases.Positions.Queries;
+namespace TicketService.Application.UseCases.Positions.Queries.GetPositions;
 
 public class GetPositionsHandler : IRequestHandler<GetPositionsQuery, PageResult<PositionDto>>
 {

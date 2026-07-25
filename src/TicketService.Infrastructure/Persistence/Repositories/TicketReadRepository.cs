@@ -15,24 +15,34 @@ public class TicketReadRepository : ITicketReadRepository
         _dbContext = dbContext;
     }
     
-    public async Task<TicketDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<TicketDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-         var ticket = await _dbContext.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(t => t.Id == id)
+            .Select(t => new TicketDto(
+                t.Id,
+                t.TicketNumber.Number,
+                t.Status.ToString(),
+                t.AuthorId,
+                t.Author.FullName.ToString(),
+                t.Description,
+                t.Type.ToString(),
+                t.CreatedAt,
+                t.Deadline,
+                t.Executors
+                    .Select(te => new EmployeeListItemForTicketDto(
+                        te.Employee.Id,
+                        te.Employee.FullName.ToString(),
+                        te.Employee.Department.Name,
+                        te.Employee.Position.Name))
+                    .ToList()
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
 
-         if (ticket == null)
-             return null;
-         
-         var ticketDto = new TicketDto(
-             ticket.Id,
-             ticket.TicketNumber.Number,
-             ticket.Description,
-             ticket.Status,
-             ticket.Deadline);
-         
-         return ticketDto;
     }
 
-    public async Task<PageResult<TicketDto>> GetAllAsync(TicketFilter filter, CancellationToken cancellationToken = default)
+    public async Task<PageResult<TicketListItemDto>> GetAllAsync(TicketFilter filter, CancellationToken cancellationToken)
     {
         var query = _dbContext.Tickets.AsNoTracking();
 
@@ -66,15 +76,16 @@ public class TicketReadRepository : ITicketReadRepository
             .OrderByDescending(e => e.CreatedAt)
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
-            .Select(t => new TicketDto(
+            .Select(t => new TicketListItemDto(
                 t.Id,
                 t.TicketNumber.Number,
                 t.Description,
                 t.Status,
-                t.Deadline))
+                t.Deadline,
+                t.CreatedAt))
             .ToListAsync(cancellationToken);
         
-        return new PageResult<TicketDto>
+        return new PageResult<TicketListItemDto>
         {
             Items = tickets,
             Page = filter.Page,
@@ -83,7 +94,7 @@ public class TicketReadRepository : ITicketReadRepository
         };
     }
 
-    public async Task<PageResult<TicketDto>> GetOverdueAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<PageResult<TicketListItemDto>> GetOverdueAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
         var query = _dbContext.Tickets
             .AsNoTracking()
@@ -95,15 +106,16 @@ public class TicketReadRepository : ITicketReadRepository
             .OrderBy(t => t.Deadline)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(t => new TicketDto(
+            .Select(t => new TicketListItemDto(
                 t.Id,
                 t.TicketNumber.Number,
                 t.Description,
                 t.Status,
-                t.Deadline))
+                t.Deadline,
+                t.CreatedAt))
             .ToListAsync(cancellationToken);
 
-        return new PageResult<TicketDto>
+        return new PageResult<TicketListItemDto>
         {
             Items = tickets,
             Page = page,

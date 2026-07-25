@@ -14,6 +14,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Id)
+            .HasColumnName("id")
             .ValueGeneratedNever();
 
         /*builder.OwnsOne(t => t.TicketNumber, ticketNumber =>
@@ -38,31 +39,39 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
             .IsUnique();
         
         builder.Property(t => t.CreatedAt)
+            .HasColumnName("created_at")
             .IsRequired();
         
-        builder.HasOne<Employee>()
+        builder.HasOne(t => t.Author)
             .WithMany()
             .HasForeignKey(t => t.AuthorId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(t => t.AuthorId)
+            .HasColumnName("author_id");
         
         builder.Property(t => t.Description)
+            .HasColumnName("description")
             .IsRequired()
             .HasMaxLength(300);
         
         builder.Property(t => t.Status)
+            .HasColumnName("status")
             .HasConversion<string>()
             .IsRequired();
         
         builder.Property(t => t.Type)
+            .HasColumnName("type")
             .HasConversion<string>()
             .IsRequired();
         
         builder.Property(t => t.Deadline)
+            .HasColumnName("deadline")
             .IsRequired();
         
         builder.HasMany(t => t.Executors)
-            .WithOne()
+            .WithOne(te => te.Ticket)
             .HasForeignKey(te => te.TicketId)
             .OnDelete(DeleteBehavior.Cascade);
         

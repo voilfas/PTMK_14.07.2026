@@ -14,21 +14,24 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.HasKey(d => d.Id);
         
         builder.Property(d => d.Id)
+            .HasColumnName("id")
             .ValueGeneratedNever();
         
         builder.Property(d => d.Name)
+            .HasColumnName("name")
             .IsRequired()
             .HasMaxLength(30);
         
         builder.Property(d => d.Code)
             .HasConversion(
-                code => code.Code,
+                code => code.Value,
                 value => CodeDepartment.FromDatabase(value))
             .HasColumnName("code")
             .HasMaxLength(15)
             .IsRequired();
 
         builder.Property(d => d.IsActive)
+            .HasColumnName("is_active")
             .IsRequired();
         
         builder.HasIndex(d => d.Code).IsUnique();

@@ -1,12 +1,15 @@
 ﻿using TicketService.Application.Common;
 using TicketService.Application.DTOs;
 using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
+using TicketService.Domain.Entities;
 
 namespace TicketService.Application.Abstractions.Persistence.Queries;
 
 public interface IEmployeeReadRepository
 {
-    Task<PageResult<EmployeeDto>> GetAllAsync(
+    Task<PageResult<EmployeeListItemDto>> GetAllAsync(
         EmployeeFilter filter,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
+
+    Task<EmployeeDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 }

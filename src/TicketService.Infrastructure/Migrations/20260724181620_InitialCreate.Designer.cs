@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TicketService.Infrastructure;
@@ -11,9 +12,11 @@ using TicketService.Infrastructure;
 namespace TicketService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260724181620_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,13 +178,13 @@ namespace TicketService.Infrastructure.Migrations
 
             modelBuilder.Entity("TicketService.Domain.Entities.Employee", b =>
                 {
-                    b.HasOne("TicketService.Domain.Entities.Department", "Department")
+                    b.HasOne("TicketService.Domain.Entities.Department", null)
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TicketService.Domain.Entities.Position", "Position")
+                    b.HasOne("TicketService.Domain.Entities.Position", null)
                         .WithMany()
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -218,42 +221,32 @@ namespace TicketService.Infrastructure.Migrations
                                 .HasForeignKey("EmployeeId");
                         });
 
-                    b.Navigation("Department");
-
                     b.Navigation("FullName")
                         .IsRequired();
-
-                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("TicketService.Domain.Entities.Ticket", b =>
                 {
-                    b.HasOne("TicketService.Domain.Entities.Employee", "Author")
+                    b.HasOne("TicketService.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("TicketService.Domain.Entities.TicketExecutor", b =>
                 {
-                    b.HasOne("TicketService.Domain.Entities.Employee", "Employee")
+                    b.HasOne("TicketService.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TicketService.Domain.Entities.Ticket", "Ticket")
+                    b.HasOne("TicketService.Domain.Entities.Ticket", null)
                         .WithMany("Executors")
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("TicketService.Domain.Entities.Ticket", b =>

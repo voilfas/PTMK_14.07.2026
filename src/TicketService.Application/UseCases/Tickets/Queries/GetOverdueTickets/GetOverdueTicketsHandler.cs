@@ -5,7 +5,7 @@ using TicketService.Application.DTOs;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetOverdueTickets;
 
-public class GetOverdueTicketsHandler : IRequestHandler<GetOverdueTicketsQuery, PageResult<TicketDto>>
+public class GetOverdueTicketsHandler : IRequestHandler<GetOverdueTicketsQuery, PageResult<TicketListItemDto>>
 {
     private readonly ITicketReadRepository _repository;
 
@@ -14,7 +14,7 @@ public class GetOverdueTicketsHandler : IRequestHandler<GetOverdueTicketsQuery, 
         _repository = repository;
     }
 
-    public async Task<PageResult<TicketDto>> Handle(
+    public async Task<PageResult<TicketListItemDto>> Handle(
         GetOverdueTicketsQuery query,
         CancellationToken cancellationToken)
     {
