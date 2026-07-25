@@ -7,4 +7,7 @@ public sealed record TicketDto(
     string Number,
     string Description,
     TicketStatus Status,
-    DateTime Deadline);
+    DateTime Deadline/*,
+    DateTime CreatedAt,
+    EmployeeDto Author,
+    IReadOnlyCollection<EmployeeDto> Executors*/);

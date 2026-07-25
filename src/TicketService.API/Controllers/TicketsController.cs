@@ -7,7 +7,7 @@ using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
 using TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
 using TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
 using TicketService.Application.UseCases.Tickets.Queries.GetOverdueTickets;
-using TicketService.Application.UseCases.Tickets.Queries.GetTicketByIdRead;
+using TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 
 namespace TicketService.API.Controllers;
@@ -45,7 +45,7 @@ public class TicketsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetTicketByIdReadQuery(id),
+            new GetTicketByIdQuery(id),
             cancellationToken);
 
         if (result.IsFailure)
