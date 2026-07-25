@@ -10,8 +10,4 @@ public interface ITicketReadRepository
     Task<PageResult<TicketListItemDto>> GetAllAsync(
         TicketFilter filter,
         CancellationToken cancellationToken = default);
-    Task<PageResult<TicketListItemDto>> GetOverdueAsync(
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken = default);
 }

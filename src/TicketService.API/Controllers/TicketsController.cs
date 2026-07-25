@@ -7,7 +7,6 @@ using TicketService.Application.UseCases.Tickets.Commands.AddExecutors;
 using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
 using TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
 using TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
-using TicketService.Application.UseCases.Tickets.Queries.GetOverdueTickets;
 using TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 
@@ -63,16 +62,6 @@ public class TicketsController : ControllerBase
         var result = await _sender.Send(
             new GetTicketsQuery(filter),
             cancellationToken);
-
-        return Ok(result);
-    }
-
-    [HttpGet("overdue")]
-    public async Task<IActionResult> GetOverdue(
-        [FromQuery] GetOverdueTicketsQuery query,
-        CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(query, cancellationToken);
 
         return Ok(result);
     }
