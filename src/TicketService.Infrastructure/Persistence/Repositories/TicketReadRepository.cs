@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
 using TicketService.Domain.ValueObjects;
 
@@ -119,5 +119,13 @@ public class TicketReadRepository : ITicketReadRepository
                 t.Key,
                 t.Count()))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetAmountOverdueAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(t => t.Deadline < DateTime.UtcNow)
+            .CountAsync(cancellationToken);
     }
 }

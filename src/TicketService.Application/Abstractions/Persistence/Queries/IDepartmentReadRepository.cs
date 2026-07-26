@@ -1,5 +1,5 @@
 ﻿using TicketService.Application.Common;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 
 namespace TicketService.Application.Abstractions.Persistence.Queries;
 

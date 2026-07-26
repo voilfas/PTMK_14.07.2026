@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Employees.Queries.GetEmployeeById;

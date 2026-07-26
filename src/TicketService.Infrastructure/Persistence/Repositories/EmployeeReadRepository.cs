@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 using TicketService.Domain.Entities;
 
