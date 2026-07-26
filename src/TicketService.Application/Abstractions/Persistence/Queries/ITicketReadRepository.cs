@@ -6,8 +6,11 @@ namespace TicketService.Application.Abstractions.Persistence.Queries;
 
 public interface ITicketReadRepository
 {
-    Task<TicketDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<TicketDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    
     Task<PageResult<TicketListItemDto>> GetAllAsync(
         TicketFilter filter,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
+    
+    Task<IReadOnlyCollection<TicketStatusReportDto>> GetStatusReportAsync(CancellationToken cancellationToken);
 }

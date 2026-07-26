@@ -109,4 +109,15 @@ public class TicketReadRepository : ITicketReadRepository
             TotalCount = totalCount
         };
     }
+
+    public async Task<IReadOnlyCollection<TicketStatusReportDto>> GetStatusReportAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .GroupBy(t => t.Status)
+            .Select(t => new TicketStatusReportDto(
+                t.Key,
+                t.Count()))
+            .ToListAsync(cancellationToken);
+    }
 }
