@@ -8,6 +8,7 @@ using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
 using TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
 using TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
 using TicketService.Application.UseCases.Tickets.Queries.GetAmountByStatus;
+using TicketService.Application.UseCases.Tickets.Queries.GetAmountCompletedTickets;
 using TicketService.Application.UseCases.Tickets.Queries.GetAmountOverdue;
 using TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
@@ -85,6 +86,17 @@ public class TicketsController : ControllerBase
     {
         var result = await _sender.Send(
             new GetAmountOverdueQuery(),
+            cancellationToken);
+        
+        return Ok(result);
+    }
+
+    [HttpGet("reports/amountCompleted")]
+    public async Task<IActionResult> GetAmountCompleted(
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new GetAmountCompletedTicketsQuery(),
             cancellationToken);
         
         return Ok(result);

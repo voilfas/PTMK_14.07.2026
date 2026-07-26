@@ -3,6 +3,7 @@ using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
 using TicketService.Application.ResponceDTOs;
 using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
+using TicketService.Domain.Enums;
 using TicketService.Domain.ValueObjects;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;
@@ -16,7 +17,9 @@ public class TicketReadRepository : ITicketReadRepository
         _dbContext = dbContext;
     }
     
-    public async Task<TicketDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TicketDto?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         return await _dbContext.Tickets
             .AsNoTracking()
@@ -43,7 +46,9 @@ public class TicketReadRepository : ITicketReadRepository
 
     }
 
-    public async Task<PageResult<TicketListItemDto>> GetAllAsync(TicketFilter filter, CancellationToken cancellationToken)
+    public async Task<PageResult<TicketListItemDto>> GetAllAsync(
+        TicketFilter filter,
+        CancellationToken cancellationToken)
     {
         var query = _dbContext.Tickets.AsNoTracking();
 
@@ -86,7 +91,8 @@ public class TicketReadRepository : ITicketReadRepository
         }
         
         
-        var totalCount = await query.CountAsync(cancellationToken);
+        var totalCount = await query.CountAsync(
+            cancellationToken);
         
         var tickets = await query
             .OrderByDescending(e => e.CreatedAt)
@@ -110,7 +116,8 @@ public class TicketReadRepository : ITicketReadRepository
         };
     }
 
-    public async Task<IReadOnlyCollection<TicketStatusReportDto>> GetStatusReportAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<TicketStatusReportDto>> GetStatusReportAsync(
+        CancellationToken cancellationToken)
     {
         return await _dbContext.Tickets
             .AsNoTracking()
@@ -121,11 +128,33 @@ public class TicketReadRepository : ITicketReadRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetAmountOverdueAsync(CancellationToken cancellationToken)
+    public async Task<int> GetAmountOverdueAsync(
+        CancellationToken cancellationToken)
     {
         return await _dbContext.Tickets
             .AsNoTracking()
             .Where(t => t.Deadline < DateTime.UtcNow)
             .CountAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<TicketCompletedAmountExecutorDto>> GetCompletedAmountAsync(
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(t => t.Status == TicketStatus.Completed)
+            .SelectMany(t => t.Executors)
+            .GroupBy(te => new
+            {
+                te.EmployeeId,
+                te.Employee.FullName.FirstName,
+                te.Employee.FullName.LastName,
+                te.Employee.FullName.Surname
+            })
+            .Select(g => new TicketCompletedAmountExecutorDto(
+                g.Key.EmployeeId,
+                $"{g.Key.LastName} {g.Key.FirstName} {g.Key.Surname}",
+                g.Count()))
+            .ToListAsync(cancellationToken);
     }
 }

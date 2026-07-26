@@ -17,4 +17,7 @@ public interface ITicketReadRepository
     
     Task<int> GetAmountOverdueAsync(
         CancellationToken cancellationToken);
+    
+    Task<IReadOnlyCollection<TicketCompletedAmountExecutorDto>>  GetCompletedAmountAsync(
+        CancellationToken cancellationToken);
 }
