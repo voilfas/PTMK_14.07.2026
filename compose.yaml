@@ -1,27 +1,39 @@
-﻿version: "3.9"
-
-services:
-  postgres:
-    image: postgres:17
-    container_name: ticketservice-postgres
+﻿services:
+  ticket-api:
+    build:
+      context: .
+      dockerfile: src/TicketService.API/Dockerfile
+    container_name: ticket-api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Database: Host=postgres;Port=5432;Database=ticket_db;Username=postgres;Password=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
+  postgres:
+    image: postgres:17
+    container_name: ticket-postgres
     environment:
       POSTGRES_DB: ticket_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ticket_db"]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 5s
+
+    restart: unless-stopped
 
 volumes:
   postgres_data:
