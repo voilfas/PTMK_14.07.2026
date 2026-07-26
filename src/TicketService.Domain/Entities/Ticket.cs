@@ -27,13 +27,14 @@ public class Ticket : AggregateRoot
         Guid authorId,
         IReadOnlyCollection<Guid> executorIds,
         string description,
-        TicketType type)
+        TicketType type,
+        DateTime? createAt = null)
     {
         Id = Guid.NewGuid();
 
         TicketNumber = TicketNumber.Generate(Id);
 
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = createAt ?? DateTime.UtcNow;
 
         AuthorId = authorId;
 
@@ -41,7 +42,9 @@ public class Ticket : AggregateRoot
 
         Type = type;
 
-        Deadline = CalculateDeadline(type);
+        CreatedAt = createAt ??  DateTime.UtcNow;
+        
+        Deadline = CalculateDeadline(type, CreatedAt);
 
         Status = TicketStatus.New;
 
@@ -55,7 +58,8 @@ public class Ticket : AggregateRoot
         Guid authorId,
         IReadOnlyCollection<Guid> executorIds,
         string description,
-        TicketType type)
+        TicketType type,
+        DateTime? createAt = null)
     {
         if (authorId == Guid.Empty)
             return Result<Ticket>.Failure(ErrorsTicket.EmptyAuthorId);
@@ -70,7 +74,7 @@ public class Ticket : AggregateRoot
             return Result<Ticket>.Failure(ErrorsTicket.EmptyExecutorId);
 
         return Result<Ticket>.Success(
-            new Ticket(authorId, executorIds, description, type));
+            new Ticket(authorId, executorIds, description, type, createAt));
     }
 
     public Result AddExecutors(IReadOnlyCollection<Guid> executorIds)
@@ -203,16 +207,18 @@ public class Ticket : AggregateRoot
         return Result.Success();
     }
 
-    private static DateTime CalculateDeadline(TicketType type)
+    private static DateTime CalculateDeadline(
+        TicketType type,
+        DateTime? createAt = null)
     {
-        var now = DateTime.UtcNow;
+        var time = createAt ?? DateTime.UtcNow;
 
         return type switch
         {
-            TicketType.Standard => now.AddDays(3),
-            TicketType.Urgent => now.AddDays(1),
-            TicketType.Critical => now.AddHours(4),
-            _ => now.AddDays(3)
+            TicketType.Standard => time.AddDays(3),
+            TicketType.Urgent => time.AddDays(1),
+            TicketType.Critical => time.AddHours(4),
+            _ => time.AddDays(3)
         };
     }
 
