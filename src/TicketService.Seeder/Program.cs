@@ -40,6 +40,34 @@ var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
 Console.WriteLine("Database connected");
 
+if (args.Contains("clean", StringComparer.OrdinalIgnoreCase))
+{
+   await db.Database.ExecuteSqlRawAsync("""
+                                        TRUNCATE TABLE
+                                            ticket_executors,
+                                            tickets,
+                                            employees,
+                                            departments,
+                                            positions
+                                        RESTART IDENTITY CASCADE;
+                                        """);
+
+   Console.WriteLine("Database cleaned.");
+
+   return;
+}
+
+int ticketsCount = 1000;
+
+foreach (var arg in args)
+{
+   if (int.TryParse(arg, out var value))
+   {
+      ticketsCount = value;
+      break;
+   }
+}
+
 Console.WriteLine("Seeding PLEASE wait..");
 
 await DepartmentSeeder.SeedAsync(db);
@@ -57,7 +85,7 @@ var employees = await db.Employees.CountAsync();
 
 Console.WriteLine($"Employees: {employees}");
 
-await TicketSeeder.SeedAsync(db, 1000000);
+await TicketSeeder.SeedAsync(db, /*1000000*/ ticketsCount);
 var tickets = await db.Tickets.CountAsync();
 
 Console.WriteLine($"Tickets: {tickets}");
