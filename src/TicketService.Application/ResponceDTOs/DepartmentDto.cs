@@ -1,4 +1,4 @@
-﻿namespace TicketService.Application.DTOs;
+﻿namespace TicketService.Application.ResponceDTOs;
 
 public sealed record DepartmentDto(
     string Name,

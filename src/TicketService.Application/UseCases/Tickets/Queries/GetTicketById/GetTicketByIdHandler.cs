@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common.ErrorsHandler;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 using TicketService.Domain.Common;
 
 namespace TicketService.Application.UseCases.Tickets.Queries.GetTicketById;

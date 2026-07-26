@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using TicketService.Application.Common;
-using TicketService.Application.DTOs;
+using TicketService.Application.ResponceDTOs;
 
 namespace TicketService.Application.UseCases.Employees.Queries.GetEmployees;
 
