@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using TicketService.Application.Abstractions;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Abstractions.Persistence.Queries;
+using TicketService.Application.Common.Cache;
 using TicketService.Infrastructure.Persistence;
 using TicketService.Infrastructure.Persistence.Repositories;
+using TicketService.Infrastructure.Services;
 
-namespace TicketService.Infrastructure.DependencyInjection;
+namespace TicketService.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -15,13 +17,22 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("Database")
+        var connectionStringPostgre = configuration.GetConnectionString("Database")
                                ?? throw new InvalidOperationException(
                                    "Connection string 'Database' was not found.");
         
+        var connectionStringRedis = configuration.GetConnectionString("Redis")
+                                    ?? throw new InvalidOperationException(
+                                        "Connection string 'Redis' was not found.");
+        
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionStringPostgre);
+        });
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = connectionStringRedis;
         });
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -37,6 +48,10 @@ public static class DependencyInjection
         
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<ITicketReadRepository, TicketReadRepository>();
+        
+        // ------
+
+        services.AddScoped<ICacheService, CacheServiceRedis>();
         
         return services;
     }
