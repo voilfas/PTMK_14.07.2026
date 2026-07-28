@@ -153,6 +153,7 @@ public class TicketReadRepository : ITicketReadRepository
                 te.Employee.FullName.LastName,
                 te.Employee.FullName.Surname
             })
+            .OrderByDescending(g => g.Count())
             .Select(g => new TicketCompletedAmountExecutorDto(
                 g.Key.EmployeeId,
                 $"{g.Key.LastName} {g.Key.FirstName} {g.Key.Surname}",
