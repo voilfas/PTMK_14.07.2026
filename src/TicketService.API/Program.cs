@@ -4,7 +4,6 @@ using Serilog;
 using TicketService.API.Exceptions;
 using TicketService.Application;
 using TicketService.Infrastructure;
-using TicketService.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
