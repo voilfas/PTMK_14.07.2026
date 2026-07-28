@@ -4,6 +4,7 @@
 ![Architecture](https://img.shields.io/badge/Clean-Architecture-success)
 ![CQRS](https://img.shields.io/badge/CQRS-MediatR-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Redis](https://img.shields.io/badge/Redis-7.4-DC382D?logo=redis)
 
 # Ticket Service
 
@@ -24,6 +25,7 @@
 - отчётность
 - массовая генерация тестовых данных
 - автоматическое применение миграций при запуске приложения
+- кэширование последних 30 заявок
 
 ---
 
@@ -65,6 +67,10 @@ TicketService.Seeder
 ```
 
 ---
+# Кеширование
+
+Для снижения нагрузки на базу данных при выполнении тяжелых отчетов используется **Redis**.
+Позволяющий хранить результаты пагинированных запросов.
 
 # Используемый стек
 
@@ -73,7 +79,7 @@ TicketService.Seeder
 - PostgreSQL
 - Docker
 - MediatR
-- FluentValidation
+- Redis Cache
 - Clean Architecture
 - DDD
 - CQRS
@@ -274,6 +280,10 @@ dotnet run --project src/TicketService.Seeder -- clean
 ## База данных
 
 > ![Swagger UI](images/db.png)
+
+## SEQ логирование
+
+> ![Swagger UI](images/log.png)
 
 ---
 
