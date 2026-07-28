@@ -4,59 +4,12 @@ using Serilog;
 using TicketService.API.Exceptions;
 using TicketService.Application;
 using TicketService.Infrastructure;
+using TicketService.Infrastructure.Persistence;
+using TicketService.Infrastructure.Services.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Host.UseSerilog((context, logger) =>
-{
-    var seqUrl = context.Configuration["Serilog:SeqUrl"];
-    Console.WriteLine("SEQ URL: " + seqUrl);
-    
-    logger
-        // Общий уровень
-        .MinimumLevel.Information()
-
-        // Фильтры
-        .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
-        
-        .MinimumLevel.Override(
-            "Microsoft.Hosting.Lifetime",
-            Serilog.Events.LogEventLevel.Information)
-
-        .MinimumLevel.Override(
-            "Microsoft.EntityFrameworkCore",
-            Serilog.Events.LogEventLevel.Warning)
-
-        .MinimumLevel.Override(
-            "Microsoft.EntityFrameworkCore.Database.Command",
-            Serilog.Events.LogEventLevel.Warning)
-
-        .MinimumLevel.Override(
-            "Microsoft.AspNetCore",
-            Serilog.Events.LogEventLevel.Warning)
-
-        .MinimumLevel.Override(
-            "Microsoft.AspNetCore.Hosting.Diagnostics",
-            Serilog.Events.LogEventLevel.Warning)
-
-        .MinimumLevel.Override(
-            "Microsoft.AspNetCore.Mvc",
-            Serilog.Events.LogEventLevel.Warning)
-
-        .MinimumLevel.Override(
-            "Microsoft.AspNetCore.Routing",
-            Serilog.Events.LogEventLevel.Warning)
-
-        // Дополнительные свойства
-        .Enrich.FromLogContext()
-
-        // Куда писать
-        .WriteTo.Console()
-
-        .WriteTo.Seq(seqUrl!);
-});
+builder.Host.AddLoggingInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

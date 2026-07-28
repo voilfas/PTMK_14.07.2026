@@ -1,6 +1,6 @@
 ﻿using TicketService.Domain.Common;
 
-namespace TicketService.Application.Common.ErrorsHandler;
+namespace TicketService.Application.Common.Errors;
 
 public static class ErrorsDepartment
 {

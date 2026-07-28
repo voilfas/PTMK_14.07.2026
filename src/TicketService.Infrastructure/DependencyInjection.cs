@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketService.Application.Abstractions;
+using TicketService.Application.Abstractions.Cache;
 using TicketService.Application.Abstractions.Persistence.Commands;
 using TicketService.Application.Abstractions.Persistence.Queries;
-using TicketService.Application.Common.Cache;
 using TicketService.Infrastructure.Persistence;
 using TicketService.Infrastructure.Persistence.Repositories;
 using TicketService.Infrastructure.Services;
+using TicketService.Infrastructure.Services.Caching;
 
 namespace TicketService.Infrastructure;
 

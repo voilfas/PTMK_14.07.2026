@@ -1,9 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
-using TicketService.Application.UseCases.Positions.Commands.CreatePosition;
-using TicketService.Application.UseCases.Positions.Queries;
-using TicketService.Application.UseCases.Positions.Queries.GetPositions;
+using TicketService.Application.Features.Positions.Commands.CreatePosition;
+using TicketService.Application.Features.Positions.Queries.GetPositions;
 
 namespace TicketService.API.Controllers;
 

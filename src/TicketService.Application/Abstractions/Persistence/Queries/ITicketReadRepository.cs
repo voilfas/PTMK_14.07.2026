@@ -1,6 +1,7 @@
 ﻿using TicketService.Application.Common;
-using TicketService.Application.ResponceDTOs;
-using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
+using TicketService.Application.Common.Pagination;
+using TicketService.Application.DTOs.TicketDTOs;
+using TicketService.Application.Features.Tickets.Queries.GetTickets;
 
 namespace TicketService.Application.Abstractions.Persistence.Queries;
 

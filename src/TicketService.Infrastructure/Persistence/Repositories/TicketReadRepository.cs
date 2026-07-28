@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
-using TicketService.Application.ResponceDTOs;
-using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
+using TicketService.Application.Common.Pagination;
+using TicketService.Application.DTOs.EmployeeDTOs;
+using TicketService.Application.DTOs.TicketDTOs;
+using TicketService.Application.Features.Tickets.Queries.GetTickets;
 using TicketService.Domain.Enums;
 using TicketService.Domain.ValueObjects;
 

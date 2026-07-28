@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Domain.Entities;
 using TicketService.Infrastructure;
+using TicketService.Infrastructure.Persistence;
 
 namespace TicketService.Seeder.Seeders;
 

@@ -12,9 +12,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="UseCases\Departments\Commands\" />
-      <Folder Include="UseCases\Employees\Commands\" />
-      <Folder Include="UseCases\Positions\Commands\" />
+      <Folder Include="Features\Departments\Commands\" />
+      <Folder Include="Features\Employees\Commands\" />
+      <Folder Include="Features\Positions\Commands\" />
     </ItemGroup>
 
     <ItemGroup>

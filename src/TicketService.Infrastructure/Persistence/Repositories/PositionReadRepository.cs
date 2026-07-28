@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
-using TicketService.Application.ResponceDTOs;
+using TicketService.Application.Common.Pagination;
+using TicketService.Application.DTOs.PositionDTOs;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;
 

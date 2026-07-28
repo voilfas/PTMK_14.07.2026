@@ -3,6 +3,7 @@ using TicketService.Domain.Entities;
 using TicketService.Domain.Enums;
 using TicketService.Domain.ValueObjects;
 using TicketService.Infrastructure;
+using TicketService.Infrastructure.Persistence;
 
 namespace TicketService.Seeder.Seeders;
 
