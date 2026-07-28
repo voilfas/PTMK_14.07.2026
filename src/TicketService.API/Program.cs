@@ -1,11 +1,63 @@
+using AspNetCore.Swagger.Themes;
 using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
+using Serilog;
 using TicketService.API.Exceptions;
 using TicketService.Application;
 using TicketService.Infrastructure;
 using TicketService.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Host.UseSerilog((context, logger) =>
+{
+    var seqUrl = context.Configuration["Serilog:SeqUrl"];
+    Console.WriteLine("SEQ URL: " + seqUrl);
+    
+    logger
+        // Общий уровень
+        .MinimumLevel.Information()
+
+        // Фильтры
+        .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
+        
+        .MinimumLevel.Override(
+            "Microsoft.Hosting.Lifetime",
+            Serilog.Events.LogEventLevel.Information)
+
+        .MinimumLevel.Override(
+            "Microsoft.EntityFrameworkCore",
+            Serilog.Events.LogEventLevel.Warning)
+
+        .MinimumLevel.Override(
+            "Microsoft.EntityFrameworkCore.Database.Command",
+            Serilog.Events.LogEventLevel.Warning)
+
+        .MinimumLevel.Override(
+            "Microsoft.AspNetCore",
+            Serilog.Events.LogEventLevel.Warning)
+
+        .MinimumLevel.Override(
+            "Microsoft.AspNetCore.Hosting.Diagnostics",
+            Serilog.Events.LogEventLevel.Warning)
+
+        .MinimumLevel.Override(
+            "Microsoft.AspNetCore.Mvc",
+            Serilog.Events.LogEventLevel.Warning)
+
+        .MinimumLevel.Override(
+            "Microsoft.AspNetCore.Routing",
+            Serilog.Events.LogEventLevel.Warning)
+
+        // Дополнительные свойства
+        .Enrich.FromLogContext()
+
+        // Куда писать
+        .WriteTo.Console()
+
+        .WriteTo.Seq(seqUrl!);
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -31,14 +83,20 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
 }
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(Theme.Dark);
 }
 
 app.UseExceptionHandler();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = 
+        "HTTP {RequestMethod} {RequestPath} -> {StatusCode} in {Elapsed:0.0000} ms";
+});
 
 app.UseHttpsRedirection();
 
