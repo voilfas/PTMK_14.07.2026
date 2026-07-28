@@ -7,6 +7,7 @@ using TicketService.Application.Features.Tickets.Commands.AddExecutors;
 using TicketService.Application.Features.Tickets.Commands.ChangeStatus;
 using TicketService.Application.Features.Tickets.Commands.CreateTicket;
 using TicketService.Application.Features.Tickets.Commands.DeleteExecutor;
+using TicketService.Application.Features.Tickets.Commands.DeleteTicketById;
 using TicketService.Application.Features.Tickets.Queries.GetAmountByStatus;
 using TicketService.Application.Features.Tickets.Queries.GetAmountCompletedTickets;
 using TicketService.Application.Features.Tickets.Queries.GetAmountOverdue;
@@ -167,6 +168,21 @@ public class TicketsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete]
+    public async Task<IActionResult> DeleteTicketById(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new DeleteTicketByIdCommand(id),
+            cancellationToken);
+        
+        if (result.IsFailure)
+            return this.Problem(result.Error);
+        
+        return NoContent();
+    }
+    
     [HttpDelete("{id:guid}/executors/{executorId:guid}")]
     public async Task<IActionResult> DeleteExecutor(
         Guid id,

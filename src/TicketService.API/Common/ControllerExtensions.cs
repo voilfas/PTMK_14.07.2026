@@ -7,7 +7,7 @@ public static class ControllerExtensions
 {
     public static IActionResult Problem(
         this ControllerBase controller,
-        Error error)
+        Error? error)
     {
         var problem = ProblemDetailsFactory.Create(error);
 

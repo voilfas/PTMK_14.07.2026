@@ -13,20 +13,26 @@ public sealed class TicketRepository : ITicketRepository
         _dbContext = dbContext;
     }
     
-    public async Task AddAsync(Ticket ticket, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Ticket ticket, CancellationToken cancellationToken)
     {
         await _dbContext.Tickets.AddAsync(ticket, cancellationToken);
     }
 
-    public async Task<Ticket?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Ticket?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Tickets
             .Include(t => t.Executors)
             .SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
-    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbContext.Tickets.AnyAsync(t => t.Id == id, cancellationToken);
+    }
+
+    public async Task DeleteAsync(Ticket ticket, CancellationToken cancellationToken)
+    {
+        _dbContext.Tickets.Remove(ticket);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
