@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TicketService.Application.Abstractions.Persistence.Queries;
 using TicketService.Application.Common;
-using TicketService.Application.ResponceDTOs;
-using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
+using TicketService.Application.Common.Pagination;
+using TicketService.Application.DTOs.EmployeeDTOs;
+using TicketService.Application.Features.Employees.Queries.GetEmployees;
 using TicketService.Domain.Entities;
 
 namespace TicketService.Infrastructure.Persistence.Repositories;

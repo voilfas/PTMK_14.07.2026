@@ -1,5 +1,6 @@
 ﻿using TicketService.Application.Common;
-using TicketService.Application.ResponceDTOs;
+using TicketService.Application.Common.Pagination;
+using TicketService.Application.DTOs.PositionDTOs;
 
 namespace TicketService.Application.Abstractions.Persistence.Queries;
 

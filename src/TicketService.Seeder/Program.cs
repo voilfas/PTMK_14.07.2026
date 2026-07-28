@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicketService.Infrastructure;
+using TicketService.Infrastructure.Persistence;
 using TicketService.Seeder.Seeders;
 
 //TRUNCATE TABLE employees CASCADE;

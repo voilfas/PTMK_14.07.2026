@@ -2,16 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
 using TicketService.API.RequestDTOs.Tickets;
-using TicketService.Application.UseCases.Employees.Commands.ChangeExecutor;
-using TicketService.Application.UseCases.Tickets.Commands.AddExecutors;
-using TicketService.Application.UseCases.Tickets.Commands.ChangeStatus;
-using TicketService.Application.UseCases.Tickets.Commands.CreateTicket;
-using TicketService.Application.UseCases.Tickets.Commands.DeleteExecutor;
-using TicketService.Application.UseCases.Tickets.Queries.GetAmountByStatus;
-using TicketService.Application.UseCases.Tickets.Queries.GetAmountCompletedTickets;
-using TicketService.Application.UseCases.Tickets.Queries.GetAmountOverdue;
-using TicketService.Application.UseCases.Tickets.Queries.GetTicketById;
-using TicketService.Application.UseCases.Tickets.Queries.GetTickets;
+using TicketService.Application.Features.Employees.Commands.ChangeExecutor;
+using TicketService.Application.Features.Tickets.Commands.AddExecutors;
+using TicketService.Application.Features.Tickets.Commands.ChangeStatus;
+using TicketService.Application.Features.Tickets.Commands.CreateTicket;
+using TicketService.Application.Features.Tickets.Commands.DeleteExecutor;
+using TicketService.Application.Features.Tickets.Queries.GetAmountByStatus;
+using TicketService.Application.Features.Tickets.Queries.GetAmountCompletedTickets;
+using TicketService.Application.Features.Tickets.Queries.GetAmountOverdue;
+using TicketService.Application.Features.Tickets.Queries.GetTicketById;
+using TicketService.Application.Features.Tickets.Queries.GetTickets;
 
 namespace TicketService.API.Controllers;
 
@@ -74,7 +74,7 @@ public class TicketsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetAmountByStatusRequest(),
+            new GetAmountByStatusQuery(),
             cancellationToken);
         
         return Ok(result);

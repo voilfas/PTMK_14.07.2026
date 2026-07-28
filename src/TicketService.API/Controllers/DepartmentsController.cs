@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
-using TicketService.Application.UseCases.Departments.Commands.CreateDepartment;
-using TicketService.Application.UseCases.Departments.Queries.GetDepartments;
+using TicketService.Application.Features.Departments.Commands.CreateDepartment;
+using TicketService.Application.Features.Departments.Queries.GetDepartments;
 
 namespace TicketService.API.Controllers;
 

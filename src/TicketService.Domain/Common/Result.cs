@@ -20,5 +20,5 @@ public class Result
 
     public static Result Success() => new Result(true, null);
     
-    public static Result Failure(Error error) => new Result(false, error);
+    public static Result Failure(Error? error) => new Result(false, error);
 }

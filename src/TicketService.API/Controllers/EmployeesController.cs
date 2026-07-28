@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TicketService.API.Common;
-using TicketService.Application.UseCases.Employees.Commands.CreateEmployee;
-using TicketService.Application.UseCases.Employees.Queries.GetEmployeeById;
-using TicketService.Application.UseCases.Employees.Queries.GetEmployees;
+using TicketService.Application.Features.Employees.Commands.CreateEmployee;
+using TicketService.Application.Features.Employees.Queries.GetEmployeeById;
+using TicketService.Application.Features.Employees.Queries.GetEmployees;
 
 namespace TicketService.API.Controllers;
 
