@@ -21,4 +21,7 @@ public interface ITicketReadRepository
     
     Task<IReadOnlyCollection<TicketCompletedAmountExecutorDto>>  GetCompletedAmountAsync(
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<TicketListItemDto>> GetRecentAsync(
+        CancellationToken cancellationToken);
 }

@@ -160,4 +160,22 @@ public class TicketReadRepository : ITicketReadRepository
                 g.Count()))
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<TicketListItemDto>> GetRecentAsync(
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .OrderByDescending(t => t.CreatedAt)
+            .Take(30)
+            .Select(t => new TicketListItemDto(
+                t.Id,
+                t.TicketNumber.Number,
+                t.Description,
+                t.Status,
+                t.Deadline,
+                t.CreatedAt
+                ))
+            .ToListAsync(cancellationToken);
+    }
 }

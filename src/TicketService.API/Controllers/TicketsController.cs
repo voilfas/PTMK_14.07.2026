@@ -10,6 +10,7 @@ using TicketService.Application.Features.Tickets.Commands.DeleteExecutor;
 using TicketService.Application.Features.Tickets.Queries.GetAmountByStatus;
 using TicketService.Application.Features.Tickets.Queries.GetAmountCompletedTickets;
 using TicketService.Application.Features.Tickets.Queries.GetAmountOverdue;
+using TicketService.Application.Features.Tickets.Queries.GetRecentTickets;
 using TicketService.Application.Features.Tickets.Queries.GetTicketById;
 using TicketService.Application.Features.Tickets.Queries.GetTickets;
 
@@ -66,6 +67,17 @@ public class TicketsController : ControllerBase
             new GetTicketsQuery(filter),
             cancellationToken);
 
+        return Ok(result);
+    }
+
+    [HttpGet("recent")]
+    public async Task<IActionResult> GetRecentTickets(
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new GetRecentTicketsQuery(),
+            cancellationToken);
+        
         return Ok(result);
     }
 
